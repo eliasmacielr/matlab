@@ -40,11 +40,13 @@ for var=varargin
             otherwise, option=lower(var{1}); option_flag=1;
         end
     elseif isfloat(var{1})
-        if cities_flag, error('CITIES or NUM CITIES may be specified, but not both');
+        if cities_flag
+            error('CITIES or NUM CITIES may be specified, but not both');
         end
         if length(var{1})==1
             num_cities=round(real(var{1}));
-            if num_cities < 2, error('NUM CITIES must be an integer greater than 1');
+            if num_cities < 2
+                error('NUM CITIES must be an integer greater than 1');
             end
             cities=10*rand(num_cities, 2); cities_flag=1;
         else
@@ -85,7 +87,7 @@ if show_progress
     subplot(2, 2, 2)
     imagesc(dist_matx)
     title('Distance Matrix')
-colormap(flipud(gray))
+    colormap(flipud(gray))
 end
 
 % -- Initalize Population in a random manner
