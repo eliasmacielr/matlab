@@ -172,10 +172,3 @@ end
 varargout{1}=cities(best_ga_route, :);
 varargout{2}=best_ga_route;
 varargout{3}=best_fitness(iter);
-
-% Running examples:
-
-% tsp_ga(20, 'popsize', 60, 'mrate', 0.75, 'numiter', 250);
-
-% cities = 10*rand(40,2); [sorted_cities]=tsp_ga(cities, 'numiter', ...
-%     1000, '-results');
