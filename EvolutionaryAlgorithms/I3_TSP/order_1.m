@@ -1,11 +1,11 @@
 % ORDER 1
-function new_pop=order_1(new_pop, winners_r1)
+function new_pop=order_1(new_pop, winners)
 [p, n]=size(new_pop);
 crossover=randperm(p/2);
 children=zeros(p/4, n);
 for i=2:2:p/2
-    parent1=winners_r1(crossover(i-1), :);
-    parent2=winners_r1(crossover(i), :);
+    parent1=winners(crossover(i-1), :);
+    parent2=winners(crossover(i), :);
     child=parent2;
     ndx=ceil(n*sort(rand(1, 2)));
     while ndx(1)==ndx(2)
