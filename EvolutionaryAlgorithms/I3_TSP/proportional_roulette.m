@@ -8,10 +8,16 @@ fitness_roulette=n./fitness; % new fitness in order to select the shortest paths
 fitness_roulette=fitness_roulette.*n; % "normalize" fitness_roulette value
 winners=zeros(p/2, n);
 fitness_roulette_cumperc=cumsum(fitness_roulette./sum(fitness_roulette));
-roulette=rand(1,p/2);
-for i=1:length(roulette)
-    idx=find(fitness_roulette_cumperc>=roulette(i));
+selected=zeros(1,p/2);
+i=1;
+while length(nonzeros(selected)) < p/2
+    idx=find(fitness_roulette_cumperc>=rand);
+    if ismember(idx(1), selected)
+        continue
+    end
     winners(i, :)=pop(idx(1), :);
+    selected(i)=idx(1);
+    i=i+1;
 end
 new_pop(1:p/4, :)=winners(1:p/4, :);
 new_pop(p/2+1:3*p/4, :)=winners(p/4+1:p/2, :);
