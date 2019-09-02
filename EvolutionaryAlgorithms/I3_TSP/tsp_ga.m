@@ -10,9 +10,9 @@ function varargout=tsp_ga(varargin)
 narginchk(0, 9);
 num_cities=50;
 cities=10*rand(num_cities, 2);
-pop_size=100;
-num_iter=500;
-mutate_rate=0.85;
+pop_size=10*num_cities;
+num_iter=1000;
+mutate_rate=0.1;
 show_progress=1;
 show_results=0;
 
