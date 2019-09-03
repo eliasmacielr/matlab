@@ -13,8 +13,8 @@ cities=10*rand(num_cities, 2);
 pop_size=10*num_cities;
 num_iter=1000;
 mutate_rate=0.1;
-show_progress=1;
-show_results=0;
+show_progress=0;
+show_results=1;
 
 % -- Declare the Process Inputs
 cities_flag=0;
@@ -96,6 +96,7 @@ pop(1, :)=(1:num_cities);
 for k=2:pop_size
     pop(k, :)=randperm(num_cities);
 end
+pop_original=pop;
 
 % -- Calculation of the best route
 if num_cities < 25
@@ -128,6 +129,41 @@ for iter=1:num_iter
     % Genetic Algorithm Search
     pop=iteretic_algorithm(pop, fitness, mutate_rate);
 end
+
+%
+pop=pop_original;
+best_fitness_1=zeros(1, num_iter);
+for iter=1:num_iter
+    for p=1:pop_size
+        d=dist_matx(pop(p, 1), pop(p, num_cities));
+        for city=2:num_cities
+            d=d+dist_matx(pop(p, city-1), pop(p, city));
+        end
+        fitness(p)=d;
+    end
+    [best_fitness_1(iter), index]=min(fitness);
+    best_route=pop(index, :);
+    % Genetic Algorithm Search
+    pop=iteretic_algorithm_1(pop, fitness, mutate_rate);
+end
+
+pop=pop_original;
+best_fitness_2=zeros(1, num_iter);
+for iter=1:num_iter
+    for p=1:pop_size
+        d=dist_matx(pop(p, 1), pop(p, num_cities));
+        for city=2:num_cities
+            d=d+dist_matx(pop(p, city-1), pop(p, city));
+        end
+        fitness(p)=d;
+    end
+    [best_fitness_2(iter), index]=min(fitness);
+    best_route=pop(index, :);
+    % Genetic Algorithm Search
+    pop=iteretic_algorithm_2(pop, fitness, mutate_rate);
+end
+%
+
 % Plotting the best fitness. The plot is shown in
 % Figure 3.20
 if show_progress
@@ -149,13 +185,19 @@ if show_results
     title('Distance Matrix')
     colormap(flipud(gray))
     figure(3)
-    plot(best_fitness(1:iter), 'r', 'LineWidth', 2)
+    plot(best_fitness(1:iter), 'LineWidth', 2)
+    hold on
+    plot(best_fitness_1(1:iter), 'LineWidth', 2)
+    hold on
+    plot(best_fitness_2(1:iter), 'LineWidth', 2)
     title('Best Fitness')
     xlabel('Generation')
     ylabel('Distance')
-    axis([1 max(2, iter) 0 max(best_fitness)*1.1])
+    legend('Torneo binario','Ruleta proporcional','Ranking lineal')
+    axis([1 max(2, iter) 0 max([best_fitness best_fitness_1 ...
+        best_fitness_2])*1.25])
     figure(4)
-    route=cities([best route best route(1)], :);
+    route=cities([best_route best_route(1)], :);
     plot(route(:, 1), route(:, 2)', 'b.-')
     for c=1:num_cities
         text(cities(c, 1), cities(c, 2), [' ' num2str(c)], 'Color', ...

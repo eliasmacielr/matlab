@@ -9,10 +9,16 @@ fitness=1.0./fitness; % new fitness in order to select the shortest paths
 fitness=fitness.*10000; % "normalize" fitness value
 winners=zeros(p/2, n);
 fitness_cumperc=cumsum(fitness./sum(fitness));
-roulette=rand(1,p/2);
-for i=1:length(roulette)
-    idx=find(fitness_cumperc>=roulette(i));
+selected=zeros(1,p/2);
+i=1;
+while length(nonzeros(selected)) < p/2
+    idx=find(fitness_cumperc>=rand);
+    if ismember(idx(1), selected)
+        continue
+    end
     winners(i, :)=pop(idx(1), :);
+    selected(i)=idx(1);
+    i=i+1;
 end
 new_pop(1:p/4, :)=winners(1:p/4, :);
 new_pop(p/2+1:3*p/4, :)=winners(p/4+1:p/2, :);

@@ -1,10 +1,10 @@
 % -- The genetic algorithm search function is implemented using the MATLAB
 % -- Code shown below
-function new_pop=iteretic_algorithm(pop, fitness, mutate_rate)
+function new_pop=iteretic_algorithm_2(pop, fitness, mutate_rate)
 % -- Selection
-[new_pop, winners]=binary_tournament(pop, fitness);
+% [new_pop, winners]=binary_tournament(pop, fitness);
 % [new_pop, winners]=proportional_roulette(pop, fitness);
-% [new_pop, winners]=linear_ranking(pop, fitness);
+[new_pop, winners]=linear_ranking(pop, fitness);
 % -- Crossover
 new_pop=order_1(new_pop, winners);
 % new_pop=pmx(new_pop, winners);

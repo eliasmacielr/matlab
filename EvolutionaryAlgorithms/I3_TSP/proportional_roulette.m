@@ -4,13 +4,13 @@ function [new_pop, winners]=proportional_roulette(pop, fitness)
 [p, n]=size(pop);
 new_pop=zeros(p, n);
 format long
-fitness_roulette=n./fitness; % new fitness in order to select the shortest paths
-fitness_roulette=fitness_roulette.*n; % "normalize" fitness_roulette value
+fitness_roulette=1.0./fitness; % new fitness in order to select the shortest paths
+fitness_roulette=fitness_roulette.*10000; % "normalize" fitness_roulette value
 winners=zeros(p/2, n);
 fitness_roulette_cumperc=cumsum(fitness_roulette./sum(fitness_roulette));
 selected=zeros(1,p/2);
 i=1;
-while length(nonzeros(selected)) < p/2
+while length(nonzeros(selected)) < length(selected)
     idx=find(fitness_roulette_cumperc>=rand);
     if ismember(idx(1), selected)
         continue
