@@ -26,7 +26,7 @@ nVar=model.n;
 
 %% ACO Parameters
 
-MaxIt=300;      % Maximum Number of Iterations
+MaxIt=1000;      % Maximum Number of Iterations
 
 nAnt=40;        % Number of Ants (Population Size)
 
