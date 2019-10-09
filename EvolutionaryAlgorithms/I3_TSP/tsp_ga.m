@@ -96,7 +96,7 @@ pop(1, :)=(1:num_cities);
 for k=2:pop_size
     pop(k, :)=randperm(num_cities);
 end
-pop_original=pop;
+% pop_original=pop;
 
 % -- Calculation of the best route
 if num_cities < 25
@@ -131,38 +131,115 @@ for iter=1:num_iter
 end
 
 %
-pop=pop_original;
-best_fitness_1=zeros(1, num_iter);
-for iter=1:num_iter
-    for p=1:pop_size
-        d=dist_matx(pop(p, 1), pop(p, num_cities));
-        for city=2:num_cities
-            d=d+dist_matx(pop(p, city-1), pop(p, city));
+% pop=pop_original;
+% best_fitness_1=zeros(1, num_iter);
+% for iter=1:num_iter
+%     for p=1:pop_size
+%         d=dist_matx(pop(p, 1), pop(p, num_cities));
+%         for city=2:num_cities
+%             d=d+dist_matx(pop(p, city-1), pop(p, city));
+%         end
+%         fitness(p)=d;
+%     end
+%     [best_fitness_1(iter), index]=min(fitness);
+%     best_route=pop(index, :);
+%     % Genetic Algorithm Search
+%     pop=iteretic_algorithm_1(pop, fitness, mutate_rate);
+% end
+% 
+% pop=pop_original;
+% best_fitness_2=zeros(1, num_iter);
+% for iter=1:num_iter
+%     for p=1:pop_size
+%         d=dist_matx(pop(p, 1), pop(p, num_cities));
+%         for city=2:num_cities
+%             d=d+dist_matx(pop(p, city-1), pop(p, city));
+%         end
+%         fitness(p)=d;
+%     end
+%     [best_fitness_2(iter), index]=min(fitness);
+%     best_route=pop(index, :);
+%     % Genetic Algorithm Search
+%     pop=iteretic_algorithm_2(pop, fitness, mutate_rate);
+% end
+%
+
+%%
+
+model.n=num_cities;
+model.x=cities(1,:);
+model.y=cities(2,:);
+model.D=dist_matx;
+
+CostFunction=@(tour) TourLength(tour,model);
+
+nVar=model.n;
+
+% ACO Parameters
+
+MaxIt=1000;      % Maximum Number of Iterations
+nAnt=40;        % Number of Ants (Population Size)
+Q=1;
+tau0=10*Q/(nVar*mean(model.D(:)));	% Initial Phromone
+alpha=1;        % Phromone Exponential Weight
+beta=1;         % Heuristic Exponential Weight
+rho=0.05;       % Evaporation Rate
+
+% Initialization
+
+eta=1./model.D;             % Heuristic Information Matrix
+tau=tau0*ones(nVar,nVar);   % Phromone Matrix
+BestCost=zeros(MaxIt,1);    % Array to Hold Best Cost Values
+
+% Empty Ant
+empty_ant.Tour=[];
+empty_ant.Cost=[];
+
+% Ant Colony Matrix
+ant=repmat(empty_ant,nAnt,1);
+
+% Best Ant
+BestSol.Cost=inf;
+
+% ACO Main Loop
+
+for it=1:MaxIt
+    % Move Ants
+    for k=1:nAnt
+        ant(k).Tour=randi([1 nVar]);
+        for l=2:nVar
+            i=ant(k).Tour(end);
+            P=tau(i,:).^alpha.*eta(i,:).^beta;
+            P(ant(k).Tour)=0;
+            P=P/sum(P);
+            j=RouletteWheelSelection(P);
+            ant(k).Tour=[ant(k).Tour j];
         end
-        fitness(p)=d;
+        ant(k).Cost=CostFunction(ant(k).Tour);
+        if ant(k).Cost<BestSol.Cost
+            BestSol=ant(k);
+        end
     end
-    [best_fitness_1(iter), index]=min(fitness);
-    best_route=pop(index, :);
-    % Genetic Algorithm Search
-    pop=iteretic_algorithm_1(pop, fitness, mutate_rate);
+
+    % Update Phromones
+    for k=1:nAnt
+        tour=ant(k).Tour;
+        tour=[tour tour(1)]; %#ok
+        for l=1:nVar
+            i=tour(l);
+            j=tour(l+1);
+            tau(i,j)=tau(i,j)+Q/ant(k).Cost;
+        end
+    end
+    % Evaporation
+    tau=(1-rho)*tau;
+    % Store Best Cost
+    BestCost(it)=BestSol.Cost;
+    % Show Iteration Information
+    disp(['Iteration ' num2str(it) ': Best Cost = ' num2str(BestCost(it))]);
 end
 
-pop=pop_original;
-best_fitness_2=zeros(1, num_iter);
-for iter=1:num_iter
-    for p=1:pop_size
-        d=dist_matx(pop(p, 1), pop(p, num_cities));
-        for city=2:num_cities
-            d=d+dist_matx(pop(p, city-1), pop(p, city));
-        end
-        fitness(p)=d;
-    end
-    [best_fitness_2(iter), index]=min(fitness);
-    best_route=pop(index, :);
-    % Genetic Algorithm Search
-    pop=iteretic_algorithm_2(pop, fitness, mutate_rate);
-end
-%
+%%
 
 % Plotting the best fitness. The plot is shown in
 % Figure 3.20
@@ -186,16 +263,17 @@ if show_results
     colormap(flipud(gray))
     figure(3)
     plot(best_fitness(1:iter), 'LineWidth', 2)
+%     hold on
+%     plot(best_fitness_1(1:iter), 'LineWidth', 2)
+%     hold on
+%     plot(best_fitness_2(1:iter), 'LineWidth', 2)
     hold on
-    plot(best_fitness_1(1:iter), 'LineWidth', 2)
-    hold on
-    plot(best_fitness_2(1:iter), 'LineWidth', 2)
-    title('Best Fitness')
-    xlabel('Generation')
-    ylabel('Distance')
-    legend('Torneo binario','Ruleta proporcional','Ranking lineal')
-    axis([1 max(2, iter) 0 max([best_fitness best_fitness_1 ...
-        best_fitness_2])*1.25])
+    plot(BestCost,'LineWidth',2);
+    title('Best Fitness/Tour')
+    xlabel('Generation/Iteration')
+    ylabel('Distance/Best Cost')
+    legend('BT+ORDER 1+RMS','ACO')
+    axis([1 max(2, iter) 0 max([best_fitness BestCost])*1.25])
     figure(4)
     route=cities([best_route best_route(1)], :);
     plot(route(:, 1), route(:, 2)', 'b.-')
