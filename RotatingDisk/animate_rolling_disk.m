@@ -66,18 +66,18 @@ pointA = line('xdata', xA(1), 'ydata', yA(1), 'zdata', zA(1), 'marker', 'o', 'co
 %  Animate the disk's motion by updating the figure with its current 
 %  location and orientation:
 
-pause
+% pause
 
-% animation = VideoWriter('rolling-disk.avi');
-% animation.FrameRate = 1/dt;
-% open(animation);
+animation = VideoWriter('rolling-disk.avi');
+animation.FrameRate = 1/dt;
+open(animation);
 
 for k = 1:length(xP)
     set(path, 'xdata', xP(1:k), 'ydata', yP(1:k), 'zdata', zP(1:k));
     set(disk, 'xdata', xcirc(:,k), 'ydata', ycirc(:,k), 'zdata', zcirc(:,k));
     set(pointA, 'xdata', xA(k), 'ydata', yA(k), 'zdata', zA(k));
     drawnow   
-    % writeVideo(animation, getframe(gcf));
+    writeVideo(animation, getframe(gcf));
 end 
 
-% close(animation);
+close(animation);
