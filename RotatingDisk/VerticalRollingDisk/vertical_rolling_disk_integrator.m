@@ -37,21 +37,25 @@ theta(1) = Omega*dt + theta0;
 xDisk(:,1) = x(1) + zeros(sides, 1);
 yDisk(:,1) = y(1) + circ1;
 zDisk(:,1) = z(1) + circ2;
+q_dot = zeros(N, 1);
 for t = 1:N-1
     x(t+1) = x(t) + dt*(R*cos(phi(t))*Omega);
     y(t+1) = y(t) + dt*(R*sin(phi(t))*Omega);
     phi(t+1) = omega*(t+1)*dt + phi0;
     theta(t+1) = Omega*(t+1)*dt + theta0;
+    x_dot = (x(t+1) - x(t))/dt;
+    y_dot = (y(t+1) - y(t))/dt;
+    q_dot(t+1) = sqrt(x_dot^2 + y_dot^2);
     % TODO: apply rotation matrices
     xDisk(:,t+1) = x(t+1) + zeros(sides, 1);
     yDisk(:,t+1) = y(t+1) + circ1;
     zDisk(:,t+1) = z(t+1) + circ2;
 end
 
-% Setup video
+% Setup Phase space portrait
 figure
 set(gcf, 'color', 'w')
-plot3(x(1), y(1), 0);
+plot3(x(2), y(2), q_dot(2));
 xlabel('\itx (m)')
 ylabel('\ity (m)')
 zlabel('\itz (m)            ', 'rotation', 0)
@@ -60,19 +64,49 @@ xlim([min(x)-R, max(x)+R])
 ylim([min(y)-R, max(y)+R])
 zlim([0, 1.2*(2*R)])
 grid on
-
-path = line('xdata', x(1:1), 'ydata', y(1:1), 'zdata', z(1:1), 'color', 'b', 'linewidth', 2);
-disk = patch('xdata', xDisk(:,1), 'ydata', yDisk(:,1), 'zdata', zDisk(:,1), 'facecolor', [1, 0.8, 0.6], 'linewidth', 2);
-
-animation = VideoWriter('vertical-rolling-disk.avi');
+animation = VideoWriter('rolling-disk-phase-portrait.avi');
 animation.FrameRate = 1/dt;
 open(animation);
-
-for t = 1:N
-    set(path, 'xdata', x(1:t), 'ydata', y(1:t), 'zdata', z(1:t));
-    set(disk, 'xdata', xDisk(:,t), 'ydata', yDisk(:,t), 'zdata', zDisk(:,t));
-    drawnow
+for t = 2:N
+    plot3(x(t), y(t), q_dot(t),'bo');
+    hold on
+    xlabel('\itx (m)')
+    ylabel('\ity (m)')
+    zlabel('\itq. (m/s)            ', 'rotation', 0)
+    axis equal
+    xlim([min(x)-R, max(x)+R])
+    ylim([min(y)-R, max(y)+R])
+    zlim([0, 1.2*max(q_dot)])
+    grid on
     writeVideo(animation, getframe(gcf));
-end 
+end
+close(animation)
 
-close(animation);
+% % Setup video
+% figure
+% set(gcf, 'color', 'w')
+% plot3(x(1), y(1), 0);
+% xlabel('\itx (m)')
+% ylabel('\ity (m)')
+% zlabel('\itz (m)            ', 'rotation', 0)
+% axis equal
+% xlim([min(x)-R, max(x)+R])
+% ylim([min(y)-R, max(y)+R])
+% zlim([0, 1.2*(2*R)])
+% grid on
+%
+% path = line('xdata', x(1:1), 'ydata', y(1:1), 'zdata', z(1:1), 'color', 'b', 'linewidth', 2);
+% disk = patch('xdata', xDisk(:,1), 'ydata', yDisk(:,1), 'zdata', zDisk(:,1), 'facecolor', [1, 0.8, 0.6], 'linewidth', 2);
+%
+% animation = VideoWriter('vertical-rolling-disk.avi');
+% animation.FrameRate = 1/dt;
+% open(animation);
+%
+% for t = 1:N
+%     set(path, 'xdata', x(1:t), 'ydata', y(1:t), 'zdata', z(1:t));
+%     set(disk, 'xdata', xDisk(:,t), 'ydata', yDisk(:,t), 'zdata', zDisk(:,t));
+%     drawnow
+%     writeVideo(animation, getframe(gcf));
+% end
+%
+% close(animation);
