@@ -5,14 +5,14 @@ clf
 
 g = 9.81;   % Gravity (ms-2)
 l = 4;      % Pendulum length (m)
-T = 100;      % Total time (s)
+T = 20;     % Total time (s)
 h = 0.1;    % Timestep (s)
 N = T/h;
 
 q = zeros(N,1);
 v = zeros(N,1);
 % Initial conditions
-q(1) = pi/2;    % pendulum's angle with the vertical
+q(1) = pi/3;    % pendulum's angle with the vertical
 for k = 1 : N-1
     v(k+1) = v(k) - h * g/l * sin(q(k));
     q(k+1) = q(k) + h * v(k+1);
