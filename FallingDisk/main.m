@@ -35,6 +35,8 @@ eq_psi = diff(L_1,psi_k) + diff(L_2,psi_k) == -lambda_1*R*cos((phi_k+phi_l)/2) -
 % Constraints
 omega_1 = ((X_l-X_k)/h) + R*cos((theta_k+theta_l)/2)*sin((phi_k+phi_l)/2)*((theta_l-theta_k)/h) + R*sin((theta_k+theta_l)/2)*cos((phi_k+phi_l)/2)*((phi_l-phi_k)/h) - R*cos((phi_k+phi_l)/2)*((psi_l-psi_k)/h);
 omega_2 = ((Y_l-X_k)/h) - R*cos((theta_k+theta_l)/2)*cos((phi_k+phi_l)/2)*((theta_l-theta_k)/h) + R*sin((theta_k+theta_l)/2)*sin((phi_k+phi_l)/2)*((phi_l-phi_k)/h) - R*sin((phi_k-phi_l)/2)*((psi_l-psi_k)/h);
+%omega_1 = ((X_l-X_k)/h) == -R*cos((theta_k+theta_l)/2)*sin((phi_k+phi_l)/2)*((theta_l-theta_k)/h) - R*sin((theta_k+theta_l)/2)*cos((phi_k+phi_l)/2)*((phi_l-phi_k)/h) + R*cos((phi_k+phi_l)/2)*((psi_l-psi_k)/h);
+%omega_2 = ((Y_l-X_k)/h) ==  R*cos((theta_k+theta_l)/2)*cos((phi_k+phi_l)/2)*((theta_l-theta_k)/h) - R*sin((theta_k+theta_l)/2)*sin((phi_k+phi_l)/2)*((phi_l-phi_k)/h) + R*sin((phi_k-phi_l)/2)*((psi_l-psi_k)/h);
 
 %% Integrator
 
