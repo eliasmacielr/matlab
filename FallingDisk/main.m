@@ -12,6 +12,19 @@ syms lambda_1 lambda_2
 % step size
 syms h
 
+%% Initial conditions
+T = 10;
+h = 0.1;
+N = T/h;
+
+X = zeros(N, 1);
+Y = zeros(N, 1);
+theta = zeros(N, 1);
+phi = zeros(N, 1);
+psi = zeros(N, 1);
+lambda_1 = zeros(N, 1);
+lambda_2 = zeros(N, 1);
+
 %% Expressions for the Discrete (unconstrained) Lagrangian
 L_1 = h*( ...
     (1/2)*m*(((X_l-X_k)/h)^2 + ((Y_l-Y_k)/h)^2 + R*(sin((theta_k+theta_l)/2))^2*((theta_l-theta_k)/h)^2) + ...
