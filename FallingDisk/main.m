@@ -1,3 +1,7 @@
+clear all
+close all
+clc
+
 %% Symbols
 % q_{k-1}
 syms X_j Y_j theta_j phi_j psi_j
@@ -12,19 +16,6 @@ syms lambda_1 lambda_2
 % step size
 syms h
 
-%% Initial conditions
-T = 10;
-h = 0.1;
-N = T/h;
-
-X = zeros(N, 1);
-Y = zeros(N, 1);
-theta = zeros(N, 1);
-phi = zeros(N, 1);
-psi = zeros(N, 1);
-lambda_1 = zeros(N, 1);
-lambda_2 = zeros(N, 1);
-
 %% Expressions for the Discrete (unconstrained) Lagrangian
 L_1 = h*( ...
     (1/2)*m*(((X_l-X_k)/h)^2 + ((Y_l-Y_k)/h)^2 + R*(sin((theta_k+theta_l)/2))^2*((theta_l-theta_k)/h)^2) + ...
@@ -38,25 +29,79 @@ L_2 = h*( ...
     m*g*R*cos((theta_j+theta_k)/2) ...
     );
 
-%eq_X = simplify(diff(L_1,X_k) + diff(L_2,X_k)) == lambda_1;
-eq_X = diff(L_1,X_k) + diff(L_2,X_k) == lambda_1;
-eq_Y = diff(L_1,Y_k) + diff(L_2,Y_k) == lambda_2;
-eq_theta = diff(L_1,theta_k) + diff(L_2,theta_k) == lambda_1*R*cos((theta_k+theta_l)/2)*sin((phi_k+phi_l)/2) - lambda_2*R*cos((theta_k+theta_l)/2)*cos((phi_k+phi_l)/2);
-eq_phi = diff(L_1,phi_k) + diff(L_2,phi_k) == lambda_1*R*sin((theta_k+theta_l)/2)*cos((phi_k+phi_k)/2) + lambda_2*R*sin((theta_k+theta_l)/2)*sin((phi_k+phi_l)/2);
-eq_psi = diff(L_1,psi_k) + diff(L_2,psi_k) == -lambda_1*R*cos((phi_k+phi_l)/2) - lambda_2*R*sin((phi_k+phi_l)/2);
+%% Disk equations
+lambda_1 = diff(L_1,X_k) + diff(L_2,X_k);
+lambda_2 = diff(L_1,Y_k) + diff(L_2,Y_k);
+eq_theta = diff(L_1,theta_k) + diff(L_2,theta_k) - lambda_1*R*cos((theta_k+theta_l)/2)*sin((phi_k+phi_l)/2) + lambda_2*R*cos((theta_k+theta_l)/2)*cos((phi_k+phi_l)/2) == 0;
+eq_phi = diff(L_1,phi_k) + diff(L_2,phi_k) - lambda_1*R*sin((theta_k+theta_l)/2)*cos((phi_k+phi_k)/2) - lambda_2*R*sin((theta_k+theta_l)/2)*sin((phi_k+phi_l)/2) == 0;
+eq_psi = diff(L_1,psi_k) + diff(L_2,psi_k) + lambda_1*R*cos((phi_k+phi_l)/2) + lambda_2*R*sin((phi_k+phi_l)/2) == 0;
 
 % Constraints
-omega_1 = ((X_l-X_k)/h) + R*cos((theta_k+theta_l)/2)*sin((phi_k+phi_l)/2)*((theta_l-theta_k)/h) + R*sin((theta_k+theta_l)/2)*cos((phi_k+phi_l)/2)*((phi_l-phi_k)/h) - R*cos((phi_k+phi_l)/2)*((psi_l-psi_k)/h);
-omega_2 = ((Y_l-X_k)/h) - R*cos((theta_k+theta_l)/2)*cos((phi_k+phi_l)/2)*((theta_l-theta_k)/h) + R*sin((theta_k+theta_l)/2)*sin((phi_k+phi_l)/2)*((phi_l-phi_k)/h) - R*sin((phi_k-phi_l)/2)*((psi_l-psi_k)/h);
-%omega_1 = ((X_l-X_k)/h) == -R*cos((theta_k+theta_l)/2)*sin((phi_k+phi_l)/2)*((theta_l-theta_k)/h) - R*sin((theta_k+theta_l)/2)*cos((phi_k+phi_l)/2)*((phi_l-phi_k)/h) + R*cos((phi_k+phi_l)/2)*((psi_l-psi_k)/h);
-%omega_2 = ((Y_l-X_k)/h) ==  R*cos((theta_k+theta_l)/2)*cos((phi_k+phi_l)/2)*((theta_l-theta_k)/h) - R*sin((theta_k+theta_l)/2)*sin((phi_k+phi_l)/2)*((phi_l-phi_k)/h) + R*sin((phi_k-phi_l)/2)*((psi_l-psi_k)/h);
+eq_X = ((X_l-X_k)/h) + R*cos((theta_k+theta_l)/2)*sin((phi_k+phi_l)/2)*((theta_l-theta_k)/h) + R*sin((theta_k+theta_l)/2)*cos((phi_k+phi_l)/2)*((phi_l-phi_k)/h) - R*cos((phi_k+phi_l)/2)*((psi_l-psi_k)/h) == 0;
+eq_Y = ((Y_l-X_k)/h) - R*cos((theta_k+theta_l)/2)*cos((phi_k+phi_l)/2)*((theta_l-theta_k)/h) + R*sin((theta_k+theta_l)/2)*sin((phi_k+phi_l)/2)*((phi_l-phi_k)/h) - R*sin((phi_k-phi_l)/2)*((psi_l-psi_k)/h) == 0;
 
-%% Integrator
+%% Initial conditions and Integration
+T = 1;
+h = 0.1;
+N = T/h;
 
+m = 0.5;
+R = 0.15;
+I_A = 2;
+I_T = 1;
+g = 9.8;
 
-%% Lagrangian function (was going to use this instead of writing the complete equations)
-function Lagrangian = L(X,Y,theta,phi,psi,dX,dY,dtheta,dphi,dpsi)
-    Lagrangian = (1/2)*m*(dX^2 + dY^2 + R*(sin(theta))^2*dtheta^2) + ...
-        (1/2)*(I_A*(dpsi - dphi*sin(theta))^2 + I_T*(dtheta^2 + dphi^2*(cos(theta))^2)) - ...
-        m*g*R*cos(theta);
+q = zeros(5, N);
+
+X_j = 0;
+Y_j = 0;
+theta_j = 0;
+phi_j = 0;
+psi_j = 0;
+
+X_k = 0;
+Y_k = 0;
+theta_k = 0;
+phi_k = pi;
+psi_k = pi;
+
+sol = vpasolve( ...
+    [subs(eq_theta) subs(eq_phi) subs(eq_psi) subs(eq_X) subs(eq_Y)], ...
+    [theta_l phi_l psi_l X_l Y_l]);
+q(:,1) = [sol.X_l; sol.Y_l; sol.theta_l; sol.phi_l; sol.psi_l];
+
+X_j = X_k;
+Y_j = Y_k;
+theta_j = theta_k;
+phi_j = phi_k;
+psi_j = psi_k;
+
+X_k = q(1,1);
+Y_k = q(2,1);
+theta_k = q(3,1);
+phi_k = q(4,1);
+psi_k = q(5,1);
+
+sol = vpasolve( ...
+    [subs(eq_theta) subs(eq_phi) subs(eq_psi) subs(eq_X) subs(eq_Y)], ...
+    [theta_l phi_l psi_l X_l Y_l]);
+q(:,2) = [sol.X_l; sol.Y_l; sol.theta_l; sol.phi_l; sol.psi_l];
+
+for i = 2:N-1
+    X_j = q(1,i-1);
+    Y_j = q(2,i-1);
+    theta_j = q(3,i-1);
+    phi_j = q(4,i-1);
+    psi_j = q(5,i-1);
+
+    X_k = q(1,i);
+    Y_k = q(2,i);
+    theta_k = q(3,i);
+    phi_k = q(4,i);
+    psi_k = q(5,i);
+
+    sol = vpasolve( ...
+        [subs(eq_theta) subs(eq_phi) subs(eq_psi) subs(eq_X) subs(eq_Y)], ...
+        [theta_l phi_l psi_l X_l Y_l]);
+    q(:,i+1) = [sol.X_l; sol.Y_l; sol.theta_l; sol.phi_l; sol.psi_l];
 end
