@@ -62,8 +62,8 @@ psi_j = 0;
 X_k = 0;
 Y_k = 0;
 theta_k = 0;
-phi_k = pi;
-psi_k = pi;
+phi_k = pi/6;
+psi_k = pi/6;
 
 sol = vpasolve( ...
     [subs(eq_theta) subs(eq_phi) subs(eq_psi) subs(eq_X) subs(eq_Y)], ...
@@ -105,3 +105,27 @@ for i = 2:N-1
         [theta_l phi_l psi_l X_l Y_l]);
     q(:,i+1) = [sol.X_l; sol.Y_l; sol.theta_l; sol.phi_l; sol.psi_l];
 end
+
+%% Solve analytically
+% syms X(t) Y(t) theta(t) phi(t) psi(t)
+% 
+% lambda_1 = diff(m*X, 2);
+% lambda_2 = diff(m*Y, 2);
+% ode1 = diff((m*R^2*(sin(theta))^2 + I_T)*diff(theta)) - m*R^2*diff(theta)^2*sin(theta)*cos(theta) + ...
+%     I_A*(diff(psi) - diff(phi)*sin(theta))*diff(phi)*cos(theta) + I_T*diff(phi)^2*sin(theta)*cos(theta) - ...
+%     m*g*R*sin(theta) == lambda_1*R*cos(theta)*sin(phi) - lambda_2*R*cos(theta)*cos(phi);
+% ode2 = diff(-I_A*(diff(psi) - diff(phi)*sin(theta))*sin(theta) + I_T*diff(phi)*(cos(theta))^2) == ...
+%     lambda_1*R*sin(theta)*cos(phi) + lambda_2*R*sin(theta)*sin(phi);
+% ode3 = diff(I_A*(diff(psi) - diff(phi)*sin(theta))) == -lambda_1*R*cos(phi) - lambda_2*R*sin(phi);
+% ode4 = diff(X) == R*cos(phi)*diff(psi) - R*sin(theta)*cos(phi)*diff(phi) - R*cos(theta)*sin(phi)*diff(theta);
+% ode5 = diff(Y) == R*sin(phi)*diff(psi) - R*sin(theta)*sin(phi)*diff(phi) + R*cos(theta)*cos(phi)*diff(theta);
+% odes = [ode1; ode2; ode3; ode4; ode5];
+% 
+% cond1 = X(0) == 0;
+% cond2 = Y(0) == 0;
+% cond3 = theta(0) == 0;
+% cond4 = phi(0) == 0;
+% cond5 = psi(0) == 0;
+% conds = [cond1; cond2; cond3; cond4; cond5];
+% 
+% S = dsolve(odes,conds);
