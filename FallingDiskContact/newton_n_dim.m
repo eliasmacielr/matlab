@@ -1,4 +1,4 @@
-function [X] = newton_n_dim(tolerance_rss,initial_estimate,sym_variables,sym_equations)
+function [X] = newton_n_dim(tolerance_rss,initial_estimate,sym_variables,sym_equations,maxit)
 %% newton method for solving a system of >=n nonlinear equations for n variables
 % Given n equations, the function performs the newton method, converging
 % to the exact solution.
@@ -38,21 +38,30 @@ if length(sym_equations)==length(sym_variables)
     n_equations = 1;
 end
 stop = 0;
+i = 1;
 while ~stop
         F_X = subs(sym_equations,sym_variables,X);
         F_prime_X = subs(H,sym_variables,X);
         if ~isnumeric(F_prime_X)
             F_prime_X = eval(F_prime_X);
         end
-    if n_equations ==1
+    if n_equations == 1
+        % TODO: check if this eq. can be solved without inverting the
+        % matrix
         d_X = (F_prime_X^-1)*F_X;
     else %overdetermined solution, use generalized inverse matrix
         d_X = ((F_prime_X.'*F_prime_X)^-1)*F_prime_X.'*F_X;
     end
     X = X - d_X.' ;
-    if (sqrt(sum(d_X.^2)) < tolerance_rss)
+    if (sqrt(sum(d_X.^2)) <= tolerance_rss)
+        fprintf("%d, %.5f\n", i, sqrt(sum(d_X.^2)))
         stop = 1;
     end
+    if (i >= maxit)
+        disp('Maximum number of iterations exceeded')
+        stop = 1;
+    end
+    i = i + 1;
 end
 end
 % You're free to use and modify this code.  Sell it if you can.
