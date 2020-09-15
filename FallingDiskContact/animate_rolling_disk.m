@@ -6,54 +6,57 @@
 
 function animate_rolling_disk(X,Y,theta,phi,psi,R,h)
 
-%  Create a circle for the disk:
-angle = linspace(0, 2*pi, 36)';
+Z = R*abs(cos(theta));
+phi = pi/2 - phi;
+
+%  Create a circle for the disk
+angle = linspace(0,2*pi,36)';
 circX = R*cos(angle);
 circZ = R*sin(angle);
 
-for k = 1:length(psi)
-    R1 = [cos(phi(k)), sin(phi(k)), 0;              %  3-2-1 set of
-          -sin(phi(k)), cos(phi(k)), 0;             %  Euler angles
+for k = 1:length(phi)
+    R3 = [cos(phi(k)), -sin(phi(k)), 0;
+          sin(phi(k)), cos(phi(k)), 0;
           0, 0, 1];
     R2 = [cos(theta(k)), 0, -sin(theta(k));
           0, 1, 0;
           sin(theta(k)), 0, cos(theta(k))];
-    R3 = [1, 0, 0;
-          0, cos(psi(k)), sin(psi(k));
-          0, -sin(psi(k)), cos(psi(k))];
+    R1 = [1, 0, 0;
+          0, cos(psi(k)), -sin(psi(k));
+          0, sin(psi(k)), cos(psi(k))];
 
-    Q = R3*R2*R1;
-    % Reference configuration
-    e1 = Q*[0; -1; 0];                       %  e1
-    e2 = Q*[1; 0; 0];                        %  e2
-    e3 = Q*[0; 0; 1];                        %  e3
+    z = ([0,0,1]*R2*R3)';
+
+    Q = R1*R2*R3;
+    % Passive (alias) transformations require post-multiplication by Q
+    e1 = ([1,0,0]*Q)';   %  e1
+    e2 = ([0,1,0]*Q)';   %  e2
+    e3 = ([0,0,1]*Q)';   %  e3
 
     % Disk
-    xcirc(:,k) = X(k)                 + e1(2)*circX + e3(2)*circZ;  %  m
-    ycirc(:,k) = Y(k)                 + e1(1)*circX + e3(1)*circZ;  %  m
-    zcirc(:,k) = R*abs(cos(theta(k))) + e1(3)*circX + e3(3)*circZ;  %  m
+    xcirc(:,k) = X(k) + e2(1)*circX + e3(1)*circZ;  %  m
+    ycirc(:,k) = Y(k) + e2(2)*circX + e3(2)*circZ;  %  m
+    zcirc(:,k) = Z(k) + e2(3)*circX + e3(3)*circZ;  %  m
 
     % Path
-    xP(k,1) = X(k);                                 %  m
-    yP(k,1) = Y(k);                                 %  m
-    zP(k,1) = 0;                                    %  m
+    xP(k,1) = X(k) - R*z(1);	%  m
+    yP(k,1) = Y(k) - R*z(2);    %  m
+    zP(k,1) = 0;                %  m
 
     % Point
-    xA(k,1) = X(k)                 - R*e3(2);       %  m
-    yA(k,1) = Y(k)                 - R*e3(1);       %  m
-    zA(k,1) = R*abs(cos(theta(k))) - R*e3(3);       %  m
+    xA(k,1) = X(k) - R*e3(1);   %  m
+    yA(k,1) = Y(k) - R*e3(2);   %  m
+    zA(k,1) = Z(k) - R*e3(3);   %  m
 end
 
 %  Set up the figure window:
 
 figure
 set(gcf, 'color', 'w')
-plot3(X(1), Y(1), R*abs(cos(theta(1))));
+plot3(X(1), Y(1), Z(1));
 xlabel('\itX (m)')
-set(gca, 'xdir', 'reverse')
 ylabel('\itY (m)')
-set(gca, 'ydir', 'reverse')
-zlabel('\itZ (m)            ', 'rotation', 0)
+zlabel('\itZ (m)        ', 'rotation', 0)
 axis equal
 xlim([min(X)-R, max(X)+R])
 ylim([min(Y)-R, max(Y)+R])
