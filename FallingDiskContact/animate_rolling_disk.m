@@ -2,7 +2,6 @@
 
 %  Adapted by Elias Maciel to the case of the disk described in "A Disk
 %  Rolling on a Horizontal Surface Without Slip", Paris and Zhang, 2002.
-%  Last modified:  Sep 10, 2020
 
 function animate_rolling_disk(X,Y,theta,phi,psi,R,h)
 
