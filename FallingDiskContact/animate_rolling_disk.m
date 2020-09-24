@@ -26,11 +26,11 @@ for k = 1:length(phi)
 
     z = ([0,0,1]*R2*R1)';
 
-    Q = R3*R2*R1;
-    % Passive (alias) transformations require post-multiplication by Q
-    e1 = ([1,0,0]*Q)';   %  e1
-    e2 = ([0,1,0]*Q)';   %  e2
-    e3 = ([0,0,1]*Q)';   %  e3
+    Q_t = (R3*R2*R1)';
+    % Passive (alias) transformations require multiplication by Q'
+    e1 = Q_t*[1;0;0];   %  e1
+    e2 = Q_t*[0;1;0];   %  e2
+    e3 = Q_t*[0;0;1];   %  e3
 
     % Disk
     xcirc(:,k) = X(k) + e2(1)*circX + e3(1)*circZ;  %  m
