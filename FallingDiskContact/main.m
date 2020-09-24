@@ -92,14 +92,14 @@ eq_psi = diff(L_j,psi_j) + diff(L_i,psi_j)*partial_z + ...
     lambda_1*R*cos(phi_j) + lambda_2*R*sin(phi_j);
 
 %% Initial conditions and Integration
-T = 2;
+T = 8;
 N = int32(T/h);
 
 q = zeros(5, N);
 
 % q(:,j) = (X(j),Y(j),theta(j),phi(j),psi(j))
 q(:,1) = [0; 0; pi/6; 0; 0];
-q(:,2) = [R*pi/12; 0; pi/(6*(1+h)); 0; pi/12];
+q(:,2) = [R*pi/12; 0; pi/6; 0; pi/12];
 
 for j = 2:N-1
     X_i     = q(1,j-1);
@@ -114,10 +114,10 @@ for j = 2:N-1
     phi_j   = q(4,j);
     psi_j   = q(5,j);
 
-    F = simplify([subs(eq_theta) subs(eq_phi) subs(eq_psi) ...
-        subs(Omega_d_1) subs(Omega_d_2)]');
+    F = [subs(eq_theta) subs(eq_phi) subs(eq_psi) ...
+        subs(Omega_d_1) subs(Omega_d_2)]';
 
-    sol_j = newton_n_dim(1e-5, q(:,j)', ...
+    sol_j = newton_n_dim(1e-3, q(:,j)', ...
         [X_k Y_k theta_k phi_k psi_k], F, 100);
     q(:,j+1) = sol_j';
 end
