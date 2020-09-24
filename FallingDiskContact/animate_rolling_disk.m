@@ -6,7 +6,7 @@
 function animate_rolling_disk(X,Y,theta,phi,psi,R,h)
 
 Z = R*abs(cos(theta));
-phi = pi/2 - phi;
+phi = phi - pi/2;
 
 %  Create a circle for the disk
 angle = linspace(0,2*pi,36)';
@@ -14,19 +14,19 @@ circX = R*cos(angle);
 circZ = R*sin(angle);
 
 for k = 1:length(phi)
-    R3 = [cos(phi(k)), -sin(phi(k)), 0;
-          sin(phi(k)), cos(phi(k)), 0;
+    R1 = [cos(phi(k)), sin(phi(k)), 0;
+          -sin(phi(k)), cos(phi(k)), 0;
           0, 0, 1];
-    R2 = [cos(theta(k)), 0, -sin(theta(k));
+    R2 = [cos(theta(k)), 0, sin(theta(k));
           0, 1, 0;
-          sin(theta(k)), 0, cos(theta(k))];
-    R1 = [1, 0, 0;
+          -sin(theta(k)), 0, cos(theta(k))];
+    R3 = [1, 0, 0;
           0, cos(psi(k)), -sin(psi(k));
           0, sin(psi(k)), cos(psi(k))];
 
-    z = ([0,0,1]*R2*R3)';
+    z = ([0,0,1]*R2*R1)';
 
-    Q = R1*R2*R3;
+    Q = R3*R2*R1;
     % Passive (alias) transformations require post-multiplication by Q
     e1 = ([1,0,0]*Q)';   %  e1
     e2 = ([0,1,0]*Q)';   %  e2
