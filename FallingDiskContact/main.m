@@ -118,7 +118,7 @@ for j = 2:N-1
         subs(Omega_d_1) subs(Omega_d_2)]';
 
     sol_j = newton_n_dim(1e-3, q(:,j)', ...
-        [X_k Y_k theta_k phi_k psi_k], F, 100);
+        [X_k Y_k theta_k phi_k psi_k], F, 10);
     q(:,j+1) = sol_j';
 end
 
