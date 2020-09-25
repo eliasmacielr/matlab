@@ -128,21 +128,21 @@ animate_rolling_disk(q(1,:),q(2,:),q(3,:),q(4,:),q(5,:),R,h);
 figure
 
 subplot(2,1,1);
-title('Posición del sistema, q(0) = (0,0,\pi/6,0,0)','Interpreter','tex')
 t = linspace(0,T,N);
 plot(t,q(1,:),t,q(2,:),t,q(3,:),t,q(4,:),t,q(5,:))
 legend({'X','Y','\theta','\phi','\psi'},'Interpreter','tex')
 xlabel('Tiempo (s)')
+title('Posición del sistema, q(0) = (0,0,\pi/6,0,0)','Interpreter','tex')
 
 subplot(2,1,2);
 % Todo, ver como sacar las velocidades
-title('Velocidad del sistema, q(0) = (0,0,\pi/6,0,0)','Interpreter','tex')
 t = linspace(0,T,N-1);
 plot(t,diff(q(1,:))/h,t,diff(q(2,:))/h,t,diff(q(3,:))/h, ...
     t,diff(q(4,:))/h,t,diff(q(5,:))/h);
 legend({'X^{''}','Y^{''}','\theta^{''}','\phi^{''}','\psi^{''}'}, ...
     'Interpreter','tex')
 xlabel('Tiempo (s)')
+title('Velocidad del sistema, q''(0) = (0,0,\pi/6,0,0)','Interpreter','tex')
 
 %% Save last simulation results
 save('vars.mat','q','R','h');
