@@ -27,12 +27,9 @@ h = 0.2;
 
 %% Discrete Lagrangians and nonholonomic constraints
 % Write L(q_j,q_{j+1},z_j,z_{j+1})
-% q
-X = X_j;
-Y = Y_j;
+% q (X, Y and psi are not used here)
 theta = theta_j;
 phi = phi_j;
-psi = psi_j;
 % q_dot
 X_dot = (X_k-X_j)/h;
 Y_dot = (Y_k-Y_j)/h;
@@ -92,7 +89,7 @@ eq_psi = diff(L_j,psi_j) + diff(L_i,psi_j)*partial_z + ...
     lambda_1*R*cos(phi_j) + lambda_2*R*sin(phi_j);
 
 %% Initial conditions and Integration
-T = 8;
+T = 5;
 N = int32(T/h);
 
 q = zeros(5, N);
