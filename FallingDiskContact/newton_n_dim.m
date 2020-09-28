@@ -37,6 +37,7 @@ n_equations = 0;
 if length(sym_equations)==length(sym_variables)
     n_equations = 1;
 end
+print_n_iterations = 0;
 stop = 0;
 i = 1;
 while ~stop
@@ -52,12 +53,13 @@ while ~stop
     end
     X = X - d_X.';
     if sqrt(sum(d_X.^2)) <= tolerance_rss
-        fprintf("%d, %.4f\n", i, sqrt(sum(d_X.^2)))
         stop = 1;
+        if print_n_iterations
+            fprintf("%d, %.4f\n", i, sqrt(sum(d_X.^2)))
+        end
     end
     if i >= maxit
-        fprintf("%s\n", "Maximum number of iterations exceeded")
-        stop = 1;
+        error("Maximum number of iterations exceeded.")
     end
     i = i + 1;
 end
