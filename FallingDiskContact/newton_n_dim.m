@@ -1,5 +1,5 @@
 function [x,i] = newton_n_dim(tol,x0,sym_vars,sym_eqns,maxit)
-%% newton method for solving a system of >=n nonlinear equations for n variables
+%% newton method for solving a system of n nonlinear equations for n variables
 % Given n equations, the function performs the newton method, converging
 % to the exact solution.
 %
@@ -16,12 +16,12 @@ function [x,i] = newton_n_dim(tol,x0,sym_vars,sym_eqns,maxit)
 %                    -http://en.wikipedia.org/wiki/Newton's_method
 %%   Example:
 %        syms a b
-%        F1 = a-15;             %(15 = a)
-%        F2 = b^2-10;           %(10 = b^2)
-%        tolerance = .01;
-%        initial_est = [10,1];
+%        F1 = a - 15;             %(15 = a)
+%        F2 = b^2 - 10;           %(10 = b^2)
+%        tol = .01;
+%        x0 = [10;1];
 %with n equations and n unknowns:
-%        solution = newton_n_dim(tolerance,initial_est,[a,b],[F1;F2]);
+%        sol = newton_n_dim(tol,x0,[a;b],[F1;F2]);
 %Kyle J. Drerup
 %Ohio University EECS
 %11-9-2010
@@ -37,12 +37,12 @@ while 1
         F_prime = eval(F_prime);
     end
     d_x = F_prime \ F;
-    x = x - d_x.';
-    if sqrt(sum(d_x.^2)) <= tol
+    x = x - d_x;
+    if norm(d_x) <= tol
         break
     end
     if i >= maxit
-        error("Maximum number of iterations exceeded.")
+        error("Error: Maximum number of iterations exceeded.")
     end
     i = i + 1;
 end

@@ -1,6 +1,7 @@
+% TODO: obtain the equations and then set the values for the simulation
 % TODO: write documentation and describe the problem and where it came from
 
-clear var
+clearvars
 close all
 clc
 
@@ -12,18 +13,16 @@ syms X_j Y_j theta_j phi_j psi_j z_j
 % q_{j+1}
 syms X_k Y_k theta_k phi_k psi_k z_k
 % constants
-R = 0.15;
-m = 1;
-I_A = 1;
-I_T = 1;
-g = 9.8;
-alpha = 0.1;
+syms R m I_A I_T g alpha
 % "Control" forces
 u_psi = 0;
 % Lagrange multipliers
 syms lambda_1 lambda_2
 % step size
-h = 0.2;
+syms h;
+
+assume((R > 0) & (m > 0) & (I_A > 0) & (I_T > 0) & (g > 0) & ...
+    (alpha > 0) & (h > 0))
 
 %% Discrete Lagrangians and nonholonomic constraints
 % Write L(q_j,q_{j+1},z_j,z_{j+1})
@@ -89,12 +88,26 @@ eq_psi = diff(L_j,psi_j) + diff(L_i,psi_j)*partial_z + ...
     lambda_1*R*cos(phi_j) + lambda_2*R*sin(phi_j);
 
 %% Initial conditions and Integration
-T = 5;
+R = 0.15;
+m = 1;
+I_A = 1;
+I_T = 1;
+g = 9.8;
+alpha = 0.1;
+
+T = 3;
+h = 0.2;
 N = int32(T/h);
+
+eq_theta = subs(eq_theta);
+eq_phi = subs(eq_phi);
+eq_psi = subs(eq_psi);
+Omega_d_1 = subs(Omega_d_1);
+Omega_d_2 = subs(Omega_d_2);
 
 q = zeros(5, N);
 
-% q(:,j) = (X(j),Y(j),theta(j),phi(j),psi(j))
+% q(:,j) = [X(j);Y(j);theta(j);phi(j);psi(j)]
 q(:,1) = [0; 0; pi/6; 0; 0];
 q(:,2) = [R*pi/12; 0; pi/6; 0; pi/12];
 
@@ -111,35 +124,34 @@ for j = 2:N-1
     phi_j   = q(4,j);
     psi_j   = q(5,j);
 
-    F = [subs(eq_theta) subs(eq_phi) subs(eq_psi) ...
-        subs(Omega_d_1) subs(Omega_d_2)]';
-
-    sol_j = newton_n_dim(1e-3, q(:,j)', ...
-        [X_k Y_k theta_k phi_k psi_k], F, 10);
-    q(:,j+1) = sol_j';
+    [q(:,j+1), i] = newton_n_dim(1e-3, q(:,j), ...
+        [X_k; Y_k; theta_k; phi_k; psi_k], ...
+        [subs(eq_theta); subs(eq_phi); subs(eq_psi); ...
+        subs(Omega_d_1); subs(Omega_d_2)], 10);
+    fprintf("%.5f\n", i);
 end
 
 %% Animation and state space portraits
 animate_rolling_disk(q(1,:),q(2,:),q(3,:),q(4,:),q(5,:),R,h);
 
-figure
-
-subplot(2,1,1);
-t = linspace(0,T,N);
-plot(t,q(1,:),t,q(2,:),t,q(3,:),t,q(4,:),t,q(5,:))
-legend({'X','Y','\theta','\phi','\psi'},'Interpreter','tex')
-xlabel('Tiempo (s)')
-title('Posición del sistema, q(0) = (0,0,\pi/6,0,0)','Interpreter','tex')
-
-subplot(2,1,2);
-% Todo, ver como sacar las velocidades
-t = linspace(0,T,N-1);
-plot(t,diff(q(1,:))/h,t,diff(q(2,:))/h,t,diff(q(3,:))/h, ...
-    t,diff(q(4,:))/h,t,diff(q(5,:))/h);
-legend({'X^{''}','Y^{''}','\theta^{''}','\phi^{''}','\psi^{''}'}, ...
-    'Interpreter','tex')
-xlabel('Tiempo (s)')
-title('Velocidad del sistema, q''(0) = (0,0,\pi/6,0,0)','Interpreter','tex')
-
-%% Save last simulation results
-save('vars.mat','q','R','h');
+% figure
+% 
+% subplot(2,1,1);
+% t = linspace(0,T,N);
+% plot(t,q(1,:),t,q(2,:),t,q(3,:),t,q(4,:),t,q(5,:))
+% legend({'X','Y','\theta','\phi','\psi'},'Interpreter','tex')
+% xlabel('Tiempo (s)')
+% title('Posición del sistema, q(0) = (0,0,\pi/6,0,0)','Interpreter','tex')
+% 
+% subplot(2,1,2);
+% % Todo, ver como sacar las velocidades
+% t = linspace(0,T,N-1);
+% plot(t,diff(q(1,:))/h,t,diff(q(2,:))/h,t,diff(q(3,:))/h, ...
+%     t,diff(q(4,:))/h,t,diff(q(5,:))/h);
+% legend({'X^{''}','Y^{''}','\theta^{''}','\phi^{''}','\psi^{''}'}, ...
+%     'Interpreter','tex')
+% xlabel('Tiempo (s)')
+% title('Velocidad del sistema, q''(0) = (0,0,\pi/6,0,0)','Interpreter','tex')
+% 
+% %% Save last simulation results
+% save('vars.mat','q','R','h');
