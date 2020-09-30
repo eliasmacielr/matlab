@@ -98,7 +98,7 @@ eq_psi = diff(L_j,psi_j) + diff(L_i,psi_j)*partial_z + ...
     lambda_1*R*cos(phi_j) + lambda_2*R*sin(phi_j);
 
 %% Initial conditions and Integration
-R = 0.15;
+R = 1;
 m = 1;
 I_A = 1;
 I_T = 1;
@@ -138,7 +138,7 @@ for j = 2:N-1
     phi_j   = q(4,j);
     psi_j   = q(5,j);
 
-    tj = t0 + j*h;
+    tj = t0 + (j-1)*h;
 
     q(:,j+1) = newton_n_dim(q(:,j), [X_k; Y_k; theta_k; phi_k; psi_k], ...
         subs([eq_theta; eq_phi; eq_psi; Omega_d_1; Omega_d_2]), tol, 10);
