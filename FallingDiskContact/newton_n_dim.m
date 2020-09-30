@@ -1,4 +1,4 @@
-function [x,i] = newton_n_dim(tol,x0,sym_vars,sym_eqns,maxit)
+function [x,i] = newton_n_dim(x0,sym_vars,sym_eqns,tol,maxit)
 %% newton method for solving a system of n nonlinear equations for n variables
 % Given n equations, the function performs the newton method, converging
 % to the exact solution.
@@ -25,6 +25,9 @@ function [x,i] = newton_n_dim(tol,x0,sym_vars,sym_eqns,maxit)
 %Kyle J. Drerup
 %Ohio University EECS
 %11-9-2010
+%Elias Maciel (adaptation)
+%National University of Asuncion
+%2020-09-29
 %%  the code...
 J = jacobian(sym_eqns,sym_vars);
 x = x0;
@@ -38,7 +41,7 @@ while 1
     end
     d_x = F_prime \ F;
     x = x - d_x;
-    if norm(d_x) <= tol
+    if sqrt(sum(d_x.^2)) <= tol
         break
     end
     if i >= maxit
