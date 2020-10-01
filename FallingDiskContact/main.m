@@ -120,12 +120,16 @@ Omega_d_2 = subs(Omega_d_2);
 
 q = zeros(5, N);
 
+% Get integrator equations with the values for q
+
 % q(:,j) = [X(j);Y(j);theta(j);phi(j);psi(j)]
 q(:,1) = [0; 0; 0; 0; 0];
 % TODO: obtener q(:,2) a partir de una aproximacion
 q(:,2) = [R*pi/12; 0; 0; 0; pi/12];
 
 for j = 2:N-1
+    tj = t0 + (j-1)*h;
+
     X_i     = q(1,j-1);
     Y_i     = q(2,j-1);
     theta_i = q(3,j-1);
@@ -138,10 +142,9 @@ for j = 2:N-1
     phi_j   = q(4,j);
     psi_j   = q(5,j);
 
-    tj = t0 + (j-1)*h;
-
-    q(:,j+1) = newton_n_dim(q(:,j), [X_k; Y_k; theta_k; phi_k; psi_k], ...
+    [q(:,j+1), i] = newton_n_dim(q(:,j), [X_k; Y_k; theta_k; phi_k; psi_k], ...
         subs([eq_theta; eq_phi; eq_psi; Omega_d_1; Omega_d_2]), tol, 10);
+    fprintf("%d\n", i);
 end
 
 %% Animation and state space portraits
@@ -164,7 +167,8 @@ plot(t,diff(q(1,:))/h,t,diff(q(2,:))/h,t,diff(q(3,:))/h, ...
 legend({'X^{''}','Y^{''}','\theta^{''}','\phi^{''}','\psi^{''}'}, ...
     'Interpreter','tex')
 xlabel('Tiempo (s)')
-title('Velocidad del sistema, q''(0) = (0,0,\pi/6,0,0)','Interpreter','tex')
+title('Velocidad del sistema, q''(0) = (0,0,\pi/6,0,0)','Interpreter', ...
+    'tex')
 
 savefig(strcat('resultados-',num2str(tol),'-',num2str(T),'s'));
 
