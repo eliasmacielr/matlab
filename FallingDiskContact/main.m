@@ -1,8 +1,5 @@
-%% Initial conditions and Integration
-
-equations;
-
-load('equations');
+load sym_equations
+%% Simulation parameters and Integration
 
 R = 1;
 m = 1;
@@ -21,8 +18,6 @@ tol = 1e-6;
 F = vpa(subs([eq_theta; eq_phi; eq_psi; Omega_d_1; Omega_d_2]));
 
 q = zeros(5, N);
-
-% Get integrator equations with the values for q
 
 % q(:,j) = [X(j);Y(j);theta(j);phi(j);psi(j)]
 q(:,1) = vpa([0; 0; pi/6; 0; 0]);
