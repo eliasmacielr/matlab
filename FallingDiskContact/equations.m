@@ -1,6 +1,4 @@
-% TODO: obtain the equations and then set the values for the simulation
 % TODO: write documentation and describe the problem and where it came from
-
 clearvars
 close all
 clc
@@ -14,8 +12,6 @@ syms X_j Y_j theta_j phi_j psi_j z_j
 syms X_k Y_k theta_k phi_k psi_k z_k
 % constants
 syms R m I_A I_T g alpha
-% "Control" forces
-u_psi = 0;
 % Lagrange multipliers
 syms lambda_1 lambda_2
 % time and step size
@@ -82,7 +78,7 @@ L_i = 1/2*m*(X_dot^2 + Y_dot^2 + R^2*(sin(theta))^2*theta_dot^2) + ...
 partial_z = (1 + h*diff(L_j,z_j))/(1 - h*diff(L_i,z_j));
 
 % Write system of equations in the form F(q) = 0, which with the
-% constraint equations (1) and (2) make up the whole system to be
+% constraint equations (1) and (2) corresponds to the whole system to be
 % solved.
 
 lambda_1 = diff(L_j,X_j) + diff(L_i,X_j)*partial_z;
@@ -97,5 +93,4 @@ eq_phi = diff(L_j,phi_j) + diff(L_i,phi_j)*partial_z - ...
 eq_psi = diff(L_j,psi_j) + diff(L_i,psi_j)*partial_z + ...
     lambda_1*R*cos(phi_j) + lambda_2*R*sin(phi_j);
 
-save('equations','q_k',...
-    'eq_theta','eq_phi','eq_psi','Omega_d_1','Omega_d_2');
+save sym_equations.mat q_k eq_theta eq_phi eq_psi Omega_d_1 Omega_d_2;
