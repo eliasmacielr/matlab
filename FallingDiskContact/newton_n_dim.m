@@ -45,7 +45,7 @@ while 1
         break
     end
     if i >= maxit
-        error("Error: Maximum number of iterations exceeded.")
+        error("Maximum number of iterations exceeded.")
     end
     i = i + 1;
 end
