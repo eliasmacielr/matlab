@@ -20,12 +20,13 @@ tol = 1e-6;
 F = vpa(subs([eq_theta; eq_phi; eq_psi; Omega_d_1; Omega_d_2]));
 
 q = zeros(5, N);
+q0 = [0; 0; pi/6; 0; 0];
+qdot0 = []; % TODO cargar este vector
 
 % q(:,j) = [X(j);Y(j);theta(j);phi(j);psi(j)]
-q(:,1) = vpa([0; 0; pi/6; 0; 0]);
+q(:,1) = vpa(q0);
 % TODO: obtener q(:,2) a partir de una aproximacion
-q(:,2) = vpa([R*pi/12*cos(h*pi/4); R*pi/12*sin(h*pi/4); ...
-    pi/6; h*pi/4; pi/12]);
+q(:,2) = vpa([0.1410; 0.0106; 0.5331; 0.0389; 0.1608]);
 
 for j = 2:N-1
     tj = t0 + (j-1)*h;
