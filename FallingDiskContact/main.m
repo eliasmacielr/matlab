@@ -1,3 +1,5 @@
+equations;
+
 load sym_equations
 %% Simulation parameters and Integration
 
