@@ -1,18 +1,20 @@
 function res = diskODEs(t,y,yp)
 % y := (q,q')
 
-% TODO: obtener estos valores desde el archivo de simulacion
+% TODO: obtener estos valores desde el archivo de simulacion --------------
 R = 1;
-m = 1;
-I_T = 1;
-I_A = 1;
+m = 5;
+I_A = 1/2*m*R^2;
+I_T = 1/4*m*R^2;
 g = 9.8;
 alpha = 0.1;
+
 fx = 0*t;
 fy = 0*t;
 ftheta = 0*t;
 fphi = 0*t;
 fpsi = 0*t;
+% -------------------------------------------------------------------------
 
 theta = y(3); phi = y(4);
 DX = yp(1); DY = yp(2); Dtheta = yp(3); Dphi = yp(4); Dpsi = yp(5);

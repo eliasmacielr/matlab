@@ -4,9 +4,9 @@ load sym_equations
 %% Simulation parameters and Integration
 
 R = 1;
-m = 1;
-I_A = 1;
-I_T = 1;
+m = 5;
+I_A = 1/2*m*R^2;
+I_T = 1/4*m*R^2;
 g = 9.8;
 alpha = 0.1;
 
