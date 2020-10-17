@@ -3,12 +3,12 @@ equations;
 load sym_equations
 %% Simulation parameters and Integration
 
-R = 1;
+R = 0.5;
 m = 5;
 I_A = 1/2*m*R^2;
 I_T = 1/4*m*R^2;
-g = 9.8;
-alpha = 0.1;
+g = 9.81;
+alpha = 0;
 
 t0 = 0;
 tf = 5;
@@ -19,14 +19,17 @@ tol = 1e-6;
 
 F = vpa(subs([eq_theta; eq_phi; eq_psi; Omega_d_1; Omega_d_2]));
 
-q = zeros(5, N);
-q0 = [0; 0; pi/6; 0; 0];
-qdot0 = []; % TODO cargar este vector
+% Initial conditions
+q0 = [0; 0; 0; 0; 0];
+qdot0 = [0; 0; 0; 0; pi];
 
-% q(:,j) = [X(j);Y(j);theta(j);phi(j);psi(j)]
+q = zeros(5, N);
 q(:,1) = vpa(q0);
-% TODO: obtener q(:,2) a partir de una aproximacion
-q(:,2) = vpa([0.1410; 0.0106; 0.5331; 0.0389; 0.1608]);
+% Get q(:,2) using the disk's differential equations (it does not work)
+[y0,yp0] = decic(@diskODEs,0,[q0;qdot0],[0 0 1 0 0 0 0 0 0 1],...
+    [qdot0;zeros(5,1)],[0 0 0 0 0 0 0 0 0 0]);
+[~,y] = ode15i(@diskODEs,[0,h/2,h],y0,yp0);
+q(:,2) = vpa(transpose(y(end,1:5)));
 
 for j = 2:N-1
     tj = t0 + (j-1)*h;
@@ -43,7 +46,8 @@ for j = 2:N-1
     phi_j   = q(4,j);
     psi_j   = q(5,j);
 
-    q(:,j+1) = newton_n_dim(q(:,j), q_k, subs(F), tol, 10);
+    [q(:,j+1), i] = newton_n_dim(q(:,j), q_k, subs(F), tol, 10);
+    fprintf("%d\n", i);
 end
 
 %% Animation and state space portraits
@@ -54,22 +58,24 @@ figure
 subplot(2,1,1);
 t = linspace(0,T,N);
 plot(t,q(1,:),t,q(2,:),t,q(3,:),t,q(4,:),t,q(5,:))
-legend({'X','Y','\theta','\phi','\psi'},'Interpreter','tex')
+legend({'$X$','$Y$','$\theta$','$\phi$','$\psi$'},'Interpreter','latex')
 xlabel('Tiempo (s)')
-title('Posición del sistema, q(0) = (0,0,\pi/6,0,0)','Interpreter','tex')
+title(strcat('Posici{\''o}n del sistema, $q(0) = ', latex(sym(q0')), '$'), ...
+    'Interpreter', 'latex')
 
 subplot(2,1,2);
 % TODO: ver como sacar las velocidades
 t = linspace(0,T,N-1);
 plot(t,diff(q(1,:))/h,t,diff(q(2,:))/h,t,diff(q(3,:))/h, ...
     t,diff(q(4,:))/h,t,diff(q(5,:))/h);
-legend({'X^{''}','Y^{''}','\theta^{''}','\phi^{''}','\psi^{''}'}, ...
-    'Interpreter','tex')
+legend({'$\dot{X}$','$\dot{Y}$','$\dot{\theta}$','$\dot{\phi}$', ...
+    '$\dot{\psi}$'}, 'Interpreter','latex')
 xlabel('Tiempo (s)')
-title('Velocidad del sistema, q''(0) = (0,0,\pi/6,0,0)','Interpreter', ...
-    'tex')
+title(strcat('Velocidad del sistema, $\dot{q}(0) = ', ...
+    latex(sym(qdot0')), '$'), ...
+    'Interpreter', 'latex')
 
-savefig(strcat('resultados-',num2str(tol),'-',num2str(T),'s.fig'));
+% savefig(strcat('resultados-',num2str(tol),'-',num2str(T),'s.fig'));
 
 %% Save last simulation results
-save(strcat('vars-',num2str(tol),'-',num2str(T),'s.mat'),'q','R','h');
+% save(strcat('vars-',num2str(tol),'-',num2str(T),'s.mat'),'q','R','h');
