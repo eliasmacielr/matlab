@@ -23,8 +23,8 @@ assume((R > 0) & (m > 0) & (I_A > 0) & (I_T > 0) & (g > 0) & ...
 %% Discrete Lagrangians and nonholonomic constraints
 % Write L(q_j,q_{j+1},z_j,z_{j+1})
 % q (X, Y and psi are not used here)
-theta = theta_j;
-phi = phi_j;
+theta = (theta_k+theta_j)/2;
+phi = (phi_k+phi_j)/2;
 % q_dot
 X_dot = (X_k-X_j)/h;
 Y_dot = (Y_k-Y_j)/h;
@@ -51,11 +51,11 @@ Omega_d_2 = Y_dot - R*cos(theta)*cos(phi)*theta_dot + ...
 
 % Write L(q_{j-1},q_j,z_{j-1},z_j)
 % q
-X = X_i;
-Y = Y_i;
-theta = theta_i;
-phi = phi_i;
-psi = psi_i;
+X = (X_j+X_i)/2;
+Y = (Y_j+Y_i)/2;
+theta = (theta_j+theta_i)/2;
+phi = (phi_j+phi_i)/2;
+psi = (psi_j+psi_i)/2;
 % q_dot
 X_dot = (X_j-X_i)/h;
 Y_dot = (Y_j-Y_i)/h;
