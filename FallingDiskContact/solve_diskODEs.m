@@ -3,7 +3,7 @@ m = 5;
 I_A = 1/2*m*R^2;
 I_T = 1/4*m*R^2;
 g = 9.81;
-alpha = 0.01; % dissipation parameter
+alpha = 0.001; % dissipation parameter
 
 t0 = 0;
 tf = 10;

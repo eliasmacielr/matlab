@@ -8,27 +8,29 @@ m = 5;
 I_A = 1/2*m*R^2;
 I_T = 1/4*m*R^2;
 g = 9.81;
-alpha = 0; % dissipation parameter
+alpha = 0.001; % dissipation parameter
 
 t0 = 0;
-tf = 3;
+tf = 10;
 T = tf - t0;
 h = 0.1;
-N = int32(T/h);
+N = int32(T/h) + 1;
 tol = 1e-6;
+
+span = [.8 1.2];
 
 F = vpa(subs([eq_theta; eq_phi; eq_psi; Omega_d_1; Omega_d_2]));
 
 % Initial conditions
-q0 = [0; 0; 0; 0; 0];
+q0 = [0; 0; pi/36; 0; 0];
 qdot0 = [0; 0; 0; 0; pi];
 
 q = zeros(5, N);
 q(:,1) = vpa(q0);
 % Get q(:,2) using the disk's differential equations
-[y0,yp0] = decic(@diskODEs,0,[q0;qdot0],[0 0 1 0 0 0 0 0 0 1],...
+[y0,yp0] = decic(@diskODEs,0,[q0;qdot0],[0 0 1 0 0 0 0 0 0 1], ...
     [qdot0;zeros(5,1)],[0 0 0 0 0 0 0 0 0 0]);
-[~,y] = ode15i(@diskODEs,[0,h/2,h],y0,yp0);
+[~,y] = ode15i(@diskODEs,[t0,t0+h/2,t0+h],y0,yp0,odeset('RelTol',tol));
 q(:,2) = vpa(transpose(y(end,1:5)));
 
 for j = 2:N-1
@@ -53,27 +55,49 @@ end
 %% Animation and state space portraits
 % animate_rolling_disk(q(1,:),q(2,:),q(3,:),q(4,:),q(5,:),R,h);
 
-figure
+% Get coordinates
+X = q(1,:);
+Y = q(2,:);
+theta = q(3,:);
+phi = q(4,:);
+psi = q(5,:);
 
-subplot(2,1,1);
-t = linspace(0,T,N);
-plot(t,q(1,:),t,q(2,:),t,q(3,:),t,q(4,:),t,q(5,:))
+% Compute velocities from coordinates
+Xdot = [y0(6),diff(X)/h];
+Ydot = [y0(7),diff(Y)/h];
+thetadot = [y0(8),diff(theta)/h];
+phidot = [y0(9),diff(phi)/h];
+psidot = [y0(10),diff(psi)/h];
+
+t = t0:h:tf;
+
+figure
+subplot(2,1,1)
+plot(t,X,t,Y,t,theta,t,phi,t,psi)
 legend({'$X$','$Y$','$\theta$','$\phi$','$\psi$'},'Interpreter','latex')
 xlabel('Tiempo (s)')
-title(strcat('Posici{\''o}n del sistema, $q(0) = ', latex(sym(q0')), '$'), ...
-    'Interpreter', 'latex')
-
-subplot(2,1,2);
-% TODO: ver como sacar las velocidades
-t = linspace(0,T,N-1);
-plot(t,diff(q(1,:))/h,t,diff(q(2,:))/h,t,diff(q(3,:))/h, ...
-    t,diff(q(4,:))/h,t,diff(q(5,:))/h);
+title(strcat('Configuraci{\''o}n del sistema, $q(0) = ',...
+    latex(sym(y0(1:5)')), '$'), 'Interpreter', 'latex')
+subplot(2,1,2)
+plot(t,Xdot,t,Ydot,t,thetadot,t,phidot,t,psidot)
 legend({'$\dot{X}$','$\dot{Y}$','$\dot{\theta}$','$\dot{\phi}$', ...
     '$\dot{\psi}$'}, 'Interpreter','latex')
 xlabel('Tiempo (s)')
 title(strcat('Velocidad del sistema, $\dot{q}(0) = ', ...
-    latex(sym(qdot0')), '$'), ...
+    latex(sym(yp0(1:5)')), '$'), ...
     'Interpreter', 'latex')
+
+E = 1/2*m*(Xdot.^2 + Ydot.^2 + R^2*sin(theta).*thetadot.^2) + ...
+    1/2*(I_A*(psidot - phidot.*sin(theta)).^2 + ...
+        I_T*(thetadot.^2 + phidot.^2.*(cos(theta).^2))) + ...
+    m*g*R*cos(theta);
+
+figure
+set(gcf, 'color', 'w')
+plot(t, E, '-b', 'linewidth', 2)
+xlabel('Tiempo (s)')
+ylabel('Energía mecánica total (J)')
+ylim([min(min(E)*span), max(max(E)*span)])
 
 % savefig(strcat('resultados-',num2str(tol),'-',num2str(T),'s.fig'));
 
