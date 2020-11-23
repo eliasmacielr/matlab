@@ -11,3 +11,9 @@ fun4 = diff(partialLphi) - F_phi + alpha*partialLphi - lambda1*R*sin(theta)*cos(
 fun5 = diff(I_A*Dpsi - I_A*Dphi*sin(theta)) - F_psi + alpha*(I_A*Dpsi - I_A*Dphi*sin(theta)) + lambda1*R*cos(phi) + lambda2*R*sin(phi);
 fun6 = DX + R*cos(theta)*sin(theta) + R*sin(theta)*cos(theta)*Dphi - R*cos(phi)*Dpsi;
 fun7 = DY + R*cos(theta)*cos(phi)*Dtheta + R*sin(theta)*sin(phi)*Dphi - R*sin(phi)*Dpsi;
+
+fun8 = diff(X) - DX;
+fun9 = diff(Y) - DY;
+fun10 = diff(theta) - Dtheta;
+fun11 = diff(phi) - Dphi;
+fun12 = diff(psi) - Dpsi;

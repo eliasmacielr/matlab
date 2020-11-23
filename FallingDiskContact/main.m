@@ -8,10 +8,10 @@ m = 5;
 I_A = 1/2*m*R^2;
 I_T = 1/4*m*R^2;
 g = 9.81;
-alpha = 0;
+alpha = 0; % dissipation parameter
 
 t0 = 0;
-tf = 5;
+tf = 3;
 T = tf - t0;
 h = 0.1;
 N = int32(T/h);
@@ -25,7 +25,7 @@ qdot0 = [0; 0; 0; 0; pi];
 
 q = zeros(5, N);
 q(:,1) = vpa(q0);
-% Get q(:,2) using the disk's differential equations (it does not work)
+% Get q(:,2) using the disk's differential equations
 [y0,yp0] = decic(@diskODEs,0,[q0;qdot0],[0 0 1 0 0 0 0 0 0 1],...
     [qdot0;zeros(5,1)],[0 0 0 0 0 0 0 0 0 0]);
 [~,y] = ode15i(@diskODEs,[0,h/2,h],y0,yp0);
@@ -51,7 +51,7 @@ for j = 2:N-1
 end
 
 %% Animation and state space portraits
-animate_rolling_disk(q(1,:),q(2,:),q(3,:),q(4,:),q(5,:),R,h);
+% animate_rolling_disk(q(1,:),q(2,:),q(3,:),q(4,:),q(5,:),R,h);
 
 figure
 
