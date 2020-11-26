@@ -8,10 +8,11 @@ m = 5;
 I_A = 1/2*m*R^2;
 I_T = 1/4*m*R^2;
 g = 9.81;
-alpha = 0.001; % dissipation parameter
+
+alpha = 0; % dissipation parameter
 
 t0 = 0;
-tf = 10;
+tf = 25;
 T = tf - t0;
 h = 0.1;
 N = int32(T/h) + 1;
@@ -22,8 +23,11 @@ span = [.8 1.2];
 F = vpa(subs([eq_theta; eq_phi; eq_psi; Omega_d_1; Omega_d_2]));
 
 % Initial conditions
-q0 = [0; 0; pi/36; 0; 0];
-qdot0 = [0; 0; 0; 0; pi];
+phidot0 = -0.15*(2*pi);
+theta0 = 20*(pi/180);
+psidot0 = ((I_T-I_A-m*R^2)*sin(theta0)*phidot0^2-m*g*R)/((I_A+m*R^2)*tan(theta0)*phidot0);
+q0 = [0; 0; theta0; 0; 0];
+qdot0 = [0; 0; 0; phidot0; psidot0];
 
 q = zeros(5, N);
 q(:,1) = vpa(q0);
@@ -49,7 +53,7 @@ for j = 2:N-1
     psi_j   = q(5,j);
 
     [q(:,j+1), i] = newton_n_dim(q(:,j), q_k, subs(F), tol, 10);
-    fprintf("%d\n", i);
+%     fprintf("%d\n", i);
 end
 
 %% Animation and state space portraits
@@ -102,4 +106,4 @@ ylim([min(min(E)*span), max(max(E)*span)])
 % savefig(strcat('resultados-',num2str(tol),'-',num2str(T),'s.fig'));
 
 %% Save last simulation results
-% save(strcat('vars-',num2str(tol),'-',num2str(T),'s.mat'),'q','R','h');
+save(strcat('res-contact2-h',num2str(h),'-alpha',num2str(alpha),'.mat'),'t0','tf','h','q','y0');

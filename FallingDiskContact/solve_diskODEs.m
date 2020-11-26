@@ -3,18 +3,20 @@ m = 5;
 I_A = 1/2*m*R^2;
 I_T = 1/4*m*R^2;
 g = 9.81;
-alpha = 0.001; % dissipation parameter
 
 t0 = 0;
-tf = 10;
+tf = 25;
 h = 0.1;
 tol = 1e-6;
 
 span = [.8 1.2];
 
-q0 = [0; 0; pi/36; 0; 0];
-qdot0 = [0; 0; 0; 0; pi];
-[y0,yp0] = decic(@diskODEs,0,[q0;qdot0],[0 0 1 0 0 0 0 0 0 1], ...
+phidot0 = -0.15*(2*pi);
+theta0 = 20*(pi/180);
+psidot0 = ((I_T-I_A-m*R^2)*sin(theta0)*phidot0^2-m*g*R)/((I_A+m*R^2)*tan(theta0)*phidot0);
+q0 = [0; 0; theta0; 0; 0];
+qdot0 = [0; 0; 0; phidot0; psidot0];
+[y0,yp0] = decic(@diskODEs,0,[q0;qdot0],[0 0 1 0 0 0 0 0 1 1], ...
     [qdot0;zeros(5,1)],[0 0 0 0 0 0 0 0 0 0]);
 [t,y] = ode15i(@diskODEs,t0:h:tf,y0,yp0,odeset('RelTol',tol));
 
@@ -59,3 +61,7 @@ plot(t, E, '-b', 'linewidth', 2)
 xlabel('Tiempo (s)')
 ylabel('Energía mecánica total (J)')
 ylim([min(min(E)*span), max(max(E)*span)])
+
+q = [X, Y, theta, phi, psi];
+
+save(strcat('res-ode15i-h',num2str(h),'-alpha',num2str(0),'.mat'),'t0','tf','h','q','y0');

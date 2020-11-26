@@ -64,9 +64,7 @@ phi_dot = (phi_j-phi_i)/h;
 psi_dot = (psi_j-psi_i)/h;
 
 f_i = [0 0 0*(tj-h) 0*(tj-h) 0*(tj-h)];
-f_j = [0 0 0*tj 0*tj 0*tj];
 q_i = [X_i; Y_i; theta_i; phi_i; psi_i];
-q_j = [X_j; Y_j; theta_j; phi_j; psi_j];
 
 L_i = 1/2*m*(X_dot^2 + Y_dot^2 + R^2*sin(theta)^2*theta_dot^2) + ...
     1/2*(I_A*(psi_dot - phi_dot*sin(theta))^2 + ...
