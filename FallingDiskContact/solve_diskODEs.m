@@ -11,9 +11,10 @@ tol = 1e-6;
 
 span = [.8 1.2];
 
-phidot0 = -0.15*(2*pi);
 theta0 = 20*(pi/180);
+phidot0 = -0.15*(2*pi);
 psidot0 = ((I_T-I_A-m*R^2)*sin(theta0)*phidot0^2-m*g*R)/((I_A+m*R^2)*tan(theta0)*phidot0);
+
 q0 = [0; 0; theta0; 0; 0];
 qdot0 = [0; 0; 0; phidot0; psidot0];
 [y0,yp0] = decic(@diskODEs,0,[q0;qdot0],[0 0 1 0 0 0 0 0 1 1], ...

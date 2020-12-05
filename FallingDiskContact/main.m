@@ -23,8 +23,8 @@ span = [.8 1.2];
 F = vpa(subs([eq_theta; eq_phi; eq_psi; Omega_d_1; Omega_d_2]));
 
 % Initial conditions
-phidot0 = -0.15*(2*pi);
 theta0 = 20*(pi/180);
+phidot0 = -0.15*(2*pi);
 psidot0 = ((I_T-I_A-m*R^2)*sin(theta0)*phidot0^2-m*g*R)/((I_A+m*R^2)*tan(theta0)*phidot0);
 q0 = [0; 0; theta0; 0; 0];
 qdot0 = [0; 0; 0; phidot0; psidot0];
