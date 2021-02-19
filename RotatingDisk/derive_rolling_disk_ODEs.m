@@ -132,4 +132,4 @@ F = odeFunction(Fsym, StateVars, m, g, r, lambdat, lambdaa, L, R);
 
 %  Save M(t,Y) and F(t,Y):
 
-save rolling_disk_ODEs.mat Msym Fsym StateVars M F
+% save rolling_disk_ODEs.mat Msym Fsym StateVars M F

@@ -1,44 +1,41 @@
-% Planar Pendulum Symplectic Integrator
+% Planar Pendulum Explicit Euler Integrator
 clear
 clc
 clf
 
+% Symbols, variables and values
+syms theta theta_t omega_0
+
 g = 9.81;   % Gravity (ms-2)
 l = 4;      % Pendulum length (m)
-T = 20;     % Total time (s)
+T = 10;     % Total time (s)
 h = 0.1;    % Timestep (s)
 N = T/h;
+
+gValue = 9.81;
+rValue = l;
+omega_0Value = sqrt(gValue/rValue);
+
 
 q = zeros(N,1);
 v = zeros(N,1);
 % Initial conditions
-q(1) = pi/4;    % pendulum's angle with the vertical
+q(1) = 1;    % pendulum's angle with the vertical
 for k = 1 : N-1
     q(k+1) = q(k) + h * v(k);
     v(k+1) = v(k) - h * g/l * sin(q(k));
 end
 
-% Angle (q) to Cartesian coordinates
-x = l*sin(q);
-y = -l*cos(q);
+E(theta, theta_t, omega_0) = (1/2)*(theta_t^2+(2*omega_0*sin(theta/2))^2);
+Eplot(theta, theta_t) = subs(E,omega_0,omega_0Value);
 
-for i = 1 : N
-    subplot(2,1,1)
-    plot(x(i),y(i),'ko',[0 x(i)],[0 y(i)],'r-')
-    title(['Planar pendulum simulation (q = ' num2str(q(i)) ')'],'fontsize',12)
-    xlabel('x[m]','fontsize',12)
-    ylabel('y[m]','fontsize',12)
-    axis equal
-    axis([-l l -l 0])
-
-    subplot(2,1,2)
-    plot(q(i),v(i),'bo')
-    hold on
-    title('Planar pendulum phase portrait','fontsize',12)
-    xlabel('q','fontsize',12)
-    ylabel('q.','fontsize',12)
-    axis equal
-    axis([min(q) max(q) min(v) max(v)])
-
-    pause(h)  % Shows results at each time interval
-end
+axis equal
+plot(q,v,'bo')
+xlim([-2.5 2.5])
+ylim([-3 3])
+hold on
+plot(q(1),v(1),'ko','MarkerEdgeColor','k','MarkerFaceColor','k')
+hold on
+fc = fcontour(Eplot(theta, theta_t), [-2.5 2.5 -3 3], 'LineWidth', 1);
+xlabel('$q$','fontsize',24,'Interpreter','latex')
+ylabel('$\dot{q}$','fontsize',24,'Interpreter','latex')

@@ -82,44 +82,44 @@ x2 = Y(:,8);                %  m
 
 %  Plot the precession rate, nutation angle, and spin rate over time:
 
-% figure
-% set(gcf, 'color', 'w')
-% subplot(311)
-% plot(t, psidot/(2*pi), '-b', 'linewidth', 2)
-% xlabel('Time (s)')
-% ylabel('Precession rate (rev/s)')
-% ylim([min(min(psidot/(2*pi))*span), max(max(psidot/(2*pi))*span)])
-% subplot(312)
-% plot(t, theta*(180/pi), '-r', 'linewidth', 2)
-% xlabel('Time (s)')
-% ylabel('Nutation angle (deg)')
-% ylim([min(min(theta*(180/pi))*span), max(max(theta*(180/pi))*span)])
-% subplot(313)
-% plot(t, phidot/(2*pi), '-k', 'linewidth', 2)
-% xlabel('Time (s)')
-% ylabel('Spin rate (rev/s)')
-% ylim([min(min(phidot/(2*pi))*span), max(max(phidot/(2*pi))*span)])
+figure
+set(gcf, 'color', 'w')
+subplot(311)
+plot(t, psidot/(2*pi), '-b', 'linewidth', 2)
+xlabel('Time (s)')
+ylabel('Precession rate (rev/s)')
+ylim([min(min(psidot/(2*pi))*span), max(max(psidot/(2*pi))*span)])
+subplot(312)
+plot(t, theta*(180/pi), '-r', 'linewidth', 2)
+xlabel('Time (s)')
+ylabel('Nutation angle (deg)')
+ylim([min(min(theta*(180/pi))*span), max(max(theta*(180/pi))*span)])
+subplot(313)
+plot(t, phidot/(2*pi), '-k', 'linewidth', 2)
+xlabel('Time (s)')
+ylabel('Spin rate (rev/s)')
+ylim([min(min(phidot/(2*pi))*span), max(max(phidot/(2*pi))*span)])
 
 %  Calculate the vertical position of the disk's mass center, and then plot
 %  the mass center location over time:
 
 x3 = r*sin(theta);           %  m
 
-% figure
-% set(gcf, 'color', 'w')
-% subplot(311)
-% plot(t, x1, '-b', 'linewidth', 2)
-% xlabel('Time (s)')
-% ylabel('\itx\rm_{1} (m)')
-% subplot(312)
-% plot(t, x2, '-r', 'linewidth', 2)
-% xlabel('Time (s)')
-% ylabel('\itx\rm_{2} (m)')
-% subplot(313)
-% plot(t, x3, '-k', 'linewidth', 2)
-% xlabel('Time (s)')
-% ylabel('\itx\rm_{3} (m)')
-% ylim([0, 2*r])
+figure
+set(gcf, 'color', 'w')
+subplot(311)
+plot(t, x1, '-b', 'linewidth', 2)
+xlabel('Time (s)')
+ylabel('\itx\rm_{1} (m)')
+subplot(312)
+plot(t, x2, '-r', 'linewidth', 2)
+xlabel('Time (s)')
+ylabel('\itx\rm_{2} (m)')
+subplot(313)
+plot(t, x3, '-k', 'linewidth', 2)
+xlabel('Time (s)')
+ylabel('\itx\rm_{3} (m)')
+ylim([0, 2*r])
 
 %  Calculate the normal force and the magnitude of the friction force over 
 %  time to check for slipping:
@@ -142,12 +142,12 @@ N = m*x3ddot + m*g;                     %  N
 %  Plot the minimum coefficient of static friction over time needed to 
 %  prevent slipping:
 
-% figure
-% set(gcf, 'color', 'w')
-% plot(t, Ff./N, '-b', 'linewidth', 2)
-% xlabel('Time (s)')
-% ylabel('Coefficient of static friction')
-% ylim([min(min(Ff./N)*span), max(max(Ff./N)*span)])
+figure
+set(gcf, 'color', 'w')
+plot(t, Ff./N, '-b', 'linewidth', 2)
+xlabel('Time (s)')
+ylabel('Coefficient of static friction')
+ylim([min(min(Ff./N)*span), max(max(Ff./N)*span)])
 
 %  Calculate and plot the disk's total mechanical energy over time:
 
@@ -159,13 +159,13 @@ E = 1/2*m*(x1dot.^2 + x2dot.^2 + x3dot.^2) + ...            %  J
     1/2*(lambdat*omega1.^2 + lambdat*omega2.^2 + ...
          lambdaa*omega3.^2) + m*g*x3;
 
-% figure
-% set(gcf, 'color', 'w')
-% plot(t, E, '-b', 'linewidth', 2)
-% xlabel('Time (s)')
-% ylabel('Total mechanical energy (J)')
-% ylim([min(min(E)*span), max(max(E)*span)])
+figure
+set(gcf, 'color', 'w')
+plot(t, E, '-b', 'linewidth', 2)
+xlabel('Time (s)')
+ylabel('Total mechanical energy (J)')
+ylim([min(min(E)*span), max(max(E)*span)])
         
 %  Animate the motion of the disk:
 
-animate_rolling_disk(r, psi, theta, phi, x1, x2, x3, dt);
+% animate_rolling_disk(r, psi, theta, phi, x1, x2, x3, dt);
