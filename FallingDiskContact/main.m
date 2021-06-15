@@ -12,7 +12,7 @@ g = 9.81;
 alpha = 0; % dissipation parameter
 
 t0 = 0;
-tf = 25;
+tf = 50;
 T = tf - t0;
 h = 0.1;
 N = int32(T/h) + 1;
@@ -23,16 +23,16 @@ span = [.8 1.2];
 F = vpa(subs([eq_theta; eq_phi; eq_psi; Omega_d_1; Omega_d_2]));
 
 % Initial conditions
-theta0 = 20*(pi/180);
-phidot0 = -0.15*(2*pi);
-psidot0 = ((I_T-I_A-m*R^2)*sin(theta0)*phidot0^2-m*g*R)/((I_A+m*R^2)*tan(theta0)*phidot0);
-q0 = [0; 0; theta0; 0; 0];
-qdot0 = [0; 0; 0; phidot0; psidot0];
+% theta0 = 20*(pi/180);
+% phidot0 = -0.15*(2*pi);
+% psidot0 = ((I_T-I_A-m*R^2)*sin(theta0)*phidot0^2-m*g*R)/((I_A+m*R^2)*tan(theta0)*phidot0);
+q0 = [0; 0; 0; 0; 0];
+qdot0 = [0; 0; 0; 0; 0];
 
 q = zeros(5, N);
 q(:,1) = vpa(q0);
 % Get q(:,2) using the disk's differential equations
-[y0,yp0] = decic(@diskODEs,0,[q0;qdot0],[0 0 1 0 0 0 0 0 0 1], ...
+[y0,yp0] = decic(@diskODEs,0,[q0;qdot0],[0 0 0 0 0 0 0 0 0 0], ...
     [qdot0;zeros(5,1)],[0 0 0 0 0 0 0 0 0 0]);
 [~,y] = ode15i(@diskODEs,[t0,t0+h/2,t0+h],y0,yp0,odeset('RelTol',tol));
 q(:,2) = vpa(transpose(y(end,1:5)));
