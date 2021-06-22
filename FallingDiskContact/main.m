@@ -56,9 +56,6 @@ for j = 2:N-1
 %     fprintf("%d\n", i);
 end
 
-%% Animation and state space portraits
-% animate_rolling_disk(q(1,:),q(2,:),q(3,:),q(4,:),q(5,:),R,h);
-
 % Get coordinates
 X = q(1,:);
 Y = q(2,:);
@@ -73,37 +70,72 @@ thetadot = [y0(8),diff(theta)/h];
 phidot = [y0(9),diff(phi)/h];
 psidot = [y0(10),diff(psi)/h];
 
-t = t0:h:tf;
-
-figure
-subplot(2,1,1)
-plot(t,X,t,Y,t,theta,t,phi,t,psi)
-legend({'$X$','$Y$','$\theta$','$\phi$','$\psi$'},'Interpreter','latex')
-xlabel('Tiempo (s)')
-title(strcat('Configuraci{\''o}n del sistema, $q(0) = ',...
-    latex(sym(y0(1:5)')), '$'), 'Interpreter', 'latex')
-subplot(2,1,2)
-plot(t,Xdot,t,Ydot,t,thetadot,t,phidot,t,psidot)
-legend({'$\dot{X}$','$\dot{Y}$','$\dot{\theta}$','$\dot{\phi}$', ...
-    '$\dot{\psi}$'}, 'Interpreter','latex')
-xlabel('Tiempo (s)')
-title(strcat('Velocidad del sistema, $\dot{q}(0) = ', ...
-    latex(sym(yp0(1:5)')), '$'), ...
-    'Interpreter', 'latex')
-
 E = 1/2*m*(Xdot.^2 + Ydot.^2 + R^2*sin(theta).*thetadot.^2) + ...
     1/2*(I_A*(psidot - phidot.*sin(theta)).^2 + ...
         I_T*(thetadot.^2 + phidot.^2.*(cos(theta).^2))) + ...
     m*g*R*cos(theta);
 
-figure
-set(gcf, 'color', 'w')
-plot(t, E, '-b', 'linewidth', 2)
-xlabel('Tiempo (s)')
-ylabel('Energía mecánica total (J)')
-ylim([min(min(E)*span), max(max(E)*span)])
+%% Get reference solution
+% TODO: change to h/10
+[t,y] = ode15i(@diskODEs,t0:h:tf,y0,yp0,odeset('RelTol',tol));
 
-% savefig(strcat('resultados-',num2str(tol),'-',num2str(T),'s.fig'));
+% Get coordinates
+X_ref = y(:,1);
+Y_ref = y(:,2);
+theta_ref = y(:,3);
+phi_ref = y(:,4);
+psi_ref = y(:,5);
+
+% Compute velocities from coordinates
+Xdot_ref = [y0(6);diff(X_ref)/h];
+Ydot_ref = [y0(7);diff(Y_ref)/h];
+thetadot_ref = [y0(8);diff(theta_ref)/h];
+phidot_ref = [y0(9);diff(phi_ref)/h];
+psidot_ref = [y0(10);diff(psi_ref)/h];
+
+E_ref = 1/2*m*(Xdot_ref.^2 + Ydot_ref.^2 + R^2*sin(theta_ref).*thetadot_ref.^2) + ...
+    1/2*(I_A*(psidot_ref - phidot_ref.*sin(theta_ref)).^2 + ...
+        I_T*(thetadot_ref.^2 + phidot_ref.^2.*(cos(theta_ref).^2))) + ...
+    m*g*R*cos(theta_ref);
+
+%% Animation and state space portraits
+% animate_rolling_disk(q(1,:),q(2,:),q(3,:),q(4,:),q(5,:),R,h);
+
+% TODO: repeat this same plot instructions for all coordinates and
+% velocities and the energy function
+figure
+plot(t,X,'--x','MarkerIndices',1:10:length(X))
+hold on
+plot(t,X_ref)
+xlim([t0 tf])
+legend('Contacto (orden 2)','Referencia')
+xlabel('Tiempo (s)')
+ylabel('X (m)')
+
+% figure
+% subplot(2,1,1)
+% plot(t,X,t,Y,t,theta,t,phi,t,psi)
+% legend({'$X$','$Y$','$\theta$','$\phi$','$\psi$'},'Interpreter','latex')
+% xlabel('Tiempo (s)')
+% title(strcat('Configuraci{\''o}n del sistema, $q(0) = ',...
+%     latex(sym(y0(1:5)')), '$'), 'Interpreter', 'latex')
+% subplot(2,1,2)
+% plot(t,Xdot,t,Ydot,t,thetadot,t,phidot,t,psidot)
+% legend({'$\dot{X}$','$\dot{Y}$','$\dot{\theta}$','$\dot{\phi}$', ...
+%     '$\dot{\psi}$'}, 'Interpreter','latex')
+% xlabel('Tiempo (s)')
+% title(strcat('Velocidad del sistema, $\dot{q}(0) = ', ...
+%     latex(sym(yp0(1:5)')), '$'), ...
+%     'Interpreter', 'latex')
+%
+% figure
+% set(gcf, 'color', 'w')
+% plot(t, E, '-b', 'linewidth', 2)
+% xlabel('Tiempo (s)')
+% ylabel('Energía mecánica total (J)')
+% ylim([min(min(E)*span), max(max(E)*span)])
+%
+% % savefig(strcat('resultados-',num2str(tol),'-',num2str(T),'s.fig'));
 
 %% Save last simulation results
 save(strcat('res-contact2-h',num2str(h),'-alpha',num2str(alpha),'.mat'),'t0','tf','h','q','y0');
