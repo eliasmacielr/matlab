@@ -27,8 +27,6 @@ h = 0.1;
 N = int32(T/h) + 1;
 tol = 1e-6;
 
-span = [.8 1.2];
-
 S = vpa(subs([eq_theta; eq_phi; eq_psi; Omega_d_1; Omega_d_2]));
 
 % Initial conditions
