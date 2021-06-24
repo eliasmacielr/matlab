@@ -66,28 +66,3 @@ dimq = numel(q0);
         ];
     end
 end
-
-% 
-% q0 = [0; 0; 0; 0; 0];
-% qdot0 = [0; 0; 0; 0; 0];
-% [y0,yp0] = decic(@diskODEs,0,[q0;qdot0],[0 0 0 0 0 0 0 0 0 0], ...
-%     [qdot0;zeros(5,1)],[0 0 0 0 0 0 0 0 0 0]);
-% [t,y] = ode15i(@diskODEs,t0:h:tf,y0,yp0,odeset('RelTol',tol));
-% 
-% % Get coordinates
-% X = y(:,1);
-% Y = y(:,2);
-% theta = y(:,3);
-% phi = y(:,4);
-% psi = y(:,5);
-% 
-% % Compute velocities from coordinates
-% Xdot = [y0(6);diff(X)/h];
-% Ydot = [y0(7);diff(Y)/h];
-% thetadot = [y0(8);diff(theta)/h];
-% phidot = [y0(9);diff(phi)/h];
-% psidot = [y0(10);diff(psi)/h];
-% 
-% q = [X, Y, theta, phi, psi];
-% 
-% save(strcat('res-ode15i-h',num2str(h),'-alpha',num2str(0),'.mat'),'t0','tf','h','q','y0');

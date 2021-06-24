@@ -149,30 +149,7 @@ legend('Contacto (orden 2)','Referencia')
 xlabel('Tiempo (s)')
 ylabel('Energía (J)')
 
-% figure
-% subplot(2,1,1)
-% plot(t,X,t,Y,t,theta,t,phi,t,psi)
-% legend({'$X$','$Y$','$\theta$','$\phi$','$\psi$'},'Interpreter','latex')
-% xlabel('Tiempo (s)')
-% title(strcat('Configuraci{\''o}n del sistema, $q(0) = ',...
-%     latex(sym(y0(1:5)')), '$'), 'Interpreter', 'latex')
-% subplot(2,1,2)
-% plot(t,Xdot,t,Ydot,t,thetadot,t,phidot,t,psidot)
-% legend({'$\dot{X}$','$\dot{Y}$','$\dot{\theta}$','$\dot{\phi}$', ...
-%     '$\dot{\psi}$'}, 'Interpreter','latex')
-% xlabel('Tiempo (s)')
-% title(strcat('Velocidad del sistema, $\dot{q}(0) = ', ...
-%     latex(sym(yp0(1:5)')), '$'), ...
-%     'Interpreter', 'latex')
-%
-% figure
-% set(gcf, 'color', 'w')
-% plot(t, E, '-b', 'linewidth', 2)
-% xlabel('Tiempo (s)')
-% ylabel('Energía mecánica total (J)')
-% ylim([min(min(E)*span), max(max(E)*span)])
-%
-% % savefig(strcat('resultados-',num2str(tol),'-',num2str(T),'s.fig'));
+% savefig(strcat('resultados-',num2str(tol),'-',num2str(T),'s.fig'));
 
 %% Save last simulation results
 % save(strcat('res-contact2-h',num2str(h),'-alpha',num2str(alpha),'.mat'),'t0','tf','h','q','y0');
