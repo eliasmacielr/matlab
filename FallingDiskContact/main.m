@@ -4,6 +4,8 @@ clearvars
 close all
 clc
 
+% TODO: check if discrete_equations exists and if not, execute
+% discrete_equations.m
 load discrete_equations
 %% Simulation parameters and Integration
 

@@ -5,6 +5,7 @@ close all
 clc
 
 %% Symbols
+% Coordinates
 % q_{j-1}
 syms X_i Y_i theta_i phi_i psi_i z_i
 % q_j
