@@ -11,7 +11,7 @@ I_T = 1/4*m*R^2;
 g = 9.81;
 
 t0 = 0;
-tf = 50;
+tf = 10;
 T = tf - t0;
 h = 0.1;
 N = int32(T/h) + 1;
@@ -32,13 +32,17 @@ alpha = 0;
 % External forces
 F = {@(t) 0, @(t) 0, @(t) 0, @(t) 0, @(t) 1/2};
 
-q = zeros(5, N);
+dimq = numel(q0);
+
+q = zeros(dimq, N);
 q(:,1) = vpa(q0);
 % Get q(:,2) using the disk's differential equations
-[y0,yp0] = decic(@diskODEs,0,[q0;qdot0],[0 0 0 0 0 0 0 0 0 0], ...
-    [qdot0;zeros(5,1)],[0 0 0 0 0 0 0 0 0 0]);
+fixed_q0 = [0 0 0 0 0];
+fixed_qdot0 = [0 0 0 0 0];
+[y0,yp0] = decic(@diskODEs,0,[q0;qdot0],[fixed_q0 fixed_qdot0], ...
+    [qdot0;zeros(dimq,1)],[fixed_qdot0 zeros(1,dimq)]);
 [~,y] = ode15i(@diskODEs,[t0,t0+h/2,t0+h],y0,yp0,odeset('RelTol',tol));
-q(:,2) = vpa(transpose(y(end,1:5)));
+q(:,2) = vpa(transpose(y(end,1:dimq)));
 
 for j = 2:N-1
     tj = t0 + (j-1)*h;
@@ -93,8 +97,15 @@ E = 1/2*m*(Xdot.^2 + Ydot.^2 + R^2*sin(theta).*thetadot.^2) + ...
     m*g*R*cos(theta);
 
 %% Get reference solution
+disk.R = R;
+disk.m = m;
+disk.I_A = I_A;
+disk.I_T = I_T;
+
 h_ref = h / 10;
-[t_ref,y] = ode15i(@diskODEs,t0:h_ref:tf,y0,yp0,odeset('RelTol',tol));
+
+[t_ref,y] = solve_diskODEs(disk,q0,fixed_q0,qdot0,fixed_qdot0,alpha,...
+    F,t0,tf,h_ref,tol);
 
 % Get coordinates
 X_ref = y(:,1);
