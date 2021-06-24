@@ -1,6 +1,10 @@
-equations;
+% Elias Maciel, National University of Asuncion
 
-load sym_equations
+clearvars
+close all
+clc
+
+load discrete_equations
 %% Simulation parameters and Integration
 
 R = 0.5;
