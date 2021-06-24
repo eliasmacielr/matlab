@@ -1,68 +1,93 @@
-R = 0.5;
-m = 5;
-I_A = 1/2*m*R^2;
-I_T = 1/4*m*R^2;
+function [t,y] = solve_diskODEs(disk, ...
+    q0, fixed_q0, qdot0, fixed_qdot0, alpha, F, ...
+    t0, tf, h, tol)
+
 g = 9.81;
 
-t0 = 0;
-tf = 50;
-h = 0.1;
-tol = 1e-6;
+R = disk.R;
+m = disk.m;
+I_A = disk.I_A;
+I_T = disk.I_T;
 
-span = [.8 1.2];
+dimq = numel(q0);
 
-% theta0 = 20*(pi/180);
-% phidot0 = -0.15*(2*pi);
-% psidot0 = ((I_T-I_A-m*R^2)*sin(theta0)*phidot0^2-m*g*R)/((I_A+m*R^2)*tan(theta0)*phidot0);
+[y0,yp0] = decic(@disk_odes,0,[q0;qdot0],[fixed_q0,fixed_qdot0], ...
+    [qdot0;zeros(dimq,1)],[fixed_qdot0,zeros(1,dimq)]);
 
-q0 = [0; 0; 0; 0; 0];
-qdot0 = [0; 0; 0; 0; 0];
-[y0,yp0] = decic(@diskODEs,0,[q0;qdot0],[0 0 0 0 0 0 0 0 0 0], ...
-    [qdot0;zeros(5,1)],[0 0 0 0 0 0 0 0 0 0]);
-[t,y] = ode15i(@diskODEs,t0:h:tf,y0,yp0,odeset('RelTol',tol));
+[t,y] = ode15i(@disk_odes,t0:h:tf,y0,yp0,odeset('RelTol',tol));
 
-% Get coordinates
-X = y(:,1);
-Y = y(:,2);
-theta = y(:,3);
-phi = y(:,4);
-psi = y(:,5);
+    function res = disk_odes(t,y,yp)
+    % y := (q,q')
 
-% Compute velocities from coordinates
-Xdot = [y0(6);diff(X)/h];
-Ydot = [y0(7);diff(Y)/h];
-thetadot = [y0(8);diff(theta)/h];
-phidot = [y0(9);diff(phi)/h];
-psidot = [y0(10);diff(psi)/h];
+    FX = F{1}(t);
+    FY = F{2}(t);
+    Ftheta = F{3}(t);
+    Fphi = F{4}(t);
+    Fpsi = F{5}(t);
 
-figure
-subplot(2,1,1)
-plot(t,X,t,Y,t,theta,t,phi,t,psi)
-legend({'$X$','$Y$','$\theta$','$\phi$','$\psi$'},'Interpreter','latex')
-xlabel('Tiempo (s)')
-title(strcat('Configuraci{\''o}n del sistema, $q(0) = ',...
-    latex(sym(y0(1:5)')), '$'), 'Interpreter', 'latex')
-subplot(2,1,2)
-plot(t,Xdot,t,Ydot,t,thetadot,t,phidot,t,psidot)
-legend({'$\dot{X}$','$\dot{Y}$','$\dot{\theta}$','$\dot{\phi}$', ...
-    '$\dot{\psi}$'}, 'Interpreter','latex')
-xlabel('Tiempo (s)')
-title(strcat('Velocidad del sistema, $\dot{q}(0) = ', ...
-    latex(sym(yp0(1:5)')), '$'), ...
-    'Interpreter', 'latex')
+    theta = y(3); phi = y(4);
+    DX = yp(1); DY = yp(2); Dtheta = yp(3); Dphi = yp(4); Dpsi = yp(5);
+    DDX = yp(6); DDY = yp(7); DDtheta = yp(8); DDphi = yp(9); DDpsi = yp(10);
 
-E = 1/2*m*(Xdot.^2 + Ydot.^2 + R^2*sin(theta).*thetadot.^2) + ...
-    1/2*(I_A*(psidot - phidot.*sin(theta)).^2 + ...
-        I_T*(thetadot.^2 + phidot.^2.*(cos(theta).^2))) + ...
-    m*g*R*cos(theta);
+    lambda_1 = m*DDX - FX + alpha*m*DX;
+    lambda_2 = m*DDY - FY + alpha*m*DY;
 
-figure
-set(gcf, 'color', 'w')
-plot(t, E, '-b', 'linewidth', 2)
-xlabel('Tiempo (s)')
-ylabel('Energía mecánica total (J)')
-ylim([min(min(E)*span), max(max(E)*span)])
+    res = [
+        y(6) - DX;
+        y(7) - DY;
+        y(8) - Dtheta;
+        y(9) - Dphi;
+        y(10) - Dpsi;
 
-q = [X, Y, theta, phi, psi];
+        m*R^2*2*sin(theta)*cos(theta)*Dtheta^2 + ...
+        (m*R^2*sin(theta)^2 + I_T)*DDtheta - ...
+        m*R^2*Dtheta^2*sin(theta)*cos(theta) + ...
+        I_A*(Dpsi - Dphi*sin(theta))*Dphi*cos(theta) + ...
+        I_T*Dphi^2*cos(theta)*sin(theta) - m*g*R*sin(theta) - Ftheta + ...
+        (m*R^2*sin(theta)^2*Dtheta + I_T*Dtheta)*alpha - ...
+        lambda_1*R*cos(theta)*sin(phi) + lambda_2*R*cos(theta)*cos(phi);
 
-save(strcat('res-ode15i-h',num2str(h),'-alpha',num2str(0),'.mat'),'t0','tf','h','q','y0');
+        -I_A*((DDpsi - DDphi*sin(theta) - Dphi*cos(theta)*Dtheta)*sin(theta) + ...
+        (Dpsi - Dphi*sin(theta))*cos(theta)*Dtheta) + ...
+        I_T*(DDphi*cos(theta)^2 - 2*Dphi*cos(theta)*sin(theta)*Dtheta) - ...
+        Fphi + alpha*(-I_A*(Dpsi - Dphi*sin(theta))*sin(theta) + ...
+        I_T*Dphi*cos(theta)^2) - ...
+        lambda_1*R*sin(theta)*cos(phi) - lambda_2*R*sin(theta)*sin(phi);
+
+        I_A*(DDpsi - DDphi*sin(theta) - Dphi*cos(theta)*Dtheta) - Fpsi + ...
+        alpha*(I_A*Dpsi - I_A*Dphi*sin(theta)) + ...
+        lambda_1*R*cos(phi) + lambda_2*R*sin(phi);
+
+        DX + R*cos(theta)*sin(phi)*Dtheta + R*sin(theta)*cos(phi)*Dphi - ...
+        R*cos(phi)*Dpsi;
+
+        DY - R*cos(theta)*cos(phi)*Dtheta + R*sin(theta)*sin(phi)*Dphi - ...
+        R*sin(phi)*Dpsi;
+        ];
+    end
+end
+
+% 
+% q0 = [0; 0; 0; 0; 0];
+% qdot0 = [0; 0; 0; 0; 0];
+% [y0,yp0] = decic(@diskODEs,0,[q0;qdot0],[0 0 0 0 0 0 0 0 0 0], ...
+%     [qdot0;zeros(5,1)],[0 0 0 0 0 0 0 0 0 0]);
+% [t,y] = ode15i(@diskODEs,t0:h:tf,y0,yp0,odeset('RelTol',tol));
+% 
+% % Get coordinates
+% X = y(:,1);
+% Y = y(:,2);
+% theta = y(:,3);
+% phi = y(:,4);
+% psi = y(:,5);
+% 
+% % Compute velocities from coordinates
+% Xdot = [y0(6);diff(X)/h];
+% Ydot = [y0(7);diff(Y)/h];
+% thetadot = [y0(8);diff(theta)/h];
+% phidot = [y0(9);diff(phi)/h];
+% psidot = [y0(10);diff(psi)/h];
+% 
+% q = [X, Y, theta, phi, psi];
+% 
+% save(strcat('res-ode15i-h',num2str(h),'-alpha',num2str(0),'.mat'),'t0','tf','h','q','y0');
