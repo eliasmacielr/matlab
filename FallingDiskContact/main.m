@@ -8,10 +8,16 @@ m = 5;
 I_A = 1/2*m*R^2;
 I_T = 1/4*m*R^2;
 
+% Create disk struct
+disk.R = R;
+disk.m = m;
+disk.I_A = I_A;
+disk.I_T = I_T;
+
 g = 9.81;
 
 t0 = 0;
-tf = 10;
+tf = 5;
 T = tf - t0;
 h = 0.1;
 N = int32(T/h) + 1;
@@ -39,9 +45,8 @@ q(:,1) = vpa(q0);
 % Get q(:,2) using the disk's differential equations
 fixed_q0 = [0 0 0 0 0];
 fixed_qdot0 = [0 0 0 0 0];
-[y0,yp0] = decic(@diskODEs,0,[q0;qdot0],[fixed_q0 fixed_qdot0], ...
-    [qdot0;zeros(dimq,1)],[fixed_qdot0 zeros(1,dimq)]);
-[~,y] = ode15i(@diskODEs,[t0,t0+h/2,t0+h],y0,yp0,odeset('RelTol',tol));
+[~,y] = solve_diskODEs(disk,q0,fixed_q0,qdot0,fixed_qdot0,alpha,F,t0,...
+    t0+h,h/2,tol);
 q(:,2) = vpa(transpose(y(end,1:dimq)));
 
 for j = 2:N-1
@@ -85,11 +90,11 @@ phi = q(4,:);
 psi = q(5,:);
 
 % Compute velocities from coordinates
-Xdot = [y0(6),diff(X)/h];
-Ydot = [y0(7),diff(Y)/h];
-thetadot = [y0(8),diff(theta)/h];
-phidot = [y0(9),diff(phi)/h];
-psidot = [y0(10),diff(psi)/h];
+Xdot = [y(1,6),diff(X)/h];
+Ydot = [y(1,7),diff(Y)/h];
+thetadot = [y(1,8),diff(theta)/h];
+phidot = [y(1,9),diff(phi)/h];
+psidot = [y(1,10),diff(psi)/h];
 
 E = 1/2*m*(Xdot.^2 + Ydot.^2 + R^2*sin(theta).*thetadot.^2) + ...
     1/2*(I_A*(psidot - phidot.*sin(theta)).^2 + ...
@@ -97,11 +102,6 @@ E = 1/2*m*(Xdot.^2 + Ydot.^2 + R^2*sin(theta).*thetadot.^2) + ...
     m*g*R*cos(theta);
 
 %% Get reference solution
-disk.R = R;
-disk.m = m;
-disk.I_A = I_A;
-disk.I_T = I_T;
-
 h_ref = h / 10;
 
 [t_ref,y] = solve_diskODEs(disk,q0,fixed_q0,qdot0,fixed_qdot0,alpha,...
@@ -115,11 +115,11 @@ phi_ref = y(:,4);
 psi_ref = y(:,5);
 
 % Compute velocities from coordinates
-Xdot_ref = [y0(6);diff(X_ref)/h_ref];
-Ydot_ref = [y0(7);diff(Y_ref)/h_ref];
-thetadot_ref = [y0(8);diff(theta_ref)/h_ref];
-phidot_ref = [y0(9);diff(phi_ref)/h_ref];
-psidot_ref = [y0(10);diff(psi_ref)/h_ref];
+Xdot_ref = [y(1,6);diff(X_ref)/h_ref];
+Ydot_ref = [y(1,7);diff(Y_ref)/h_ref];
+thetadot_ref = [y(1,8);diff(theta_ref)/h_ref];
+phidot_ref = [y(1,9);diff(phi_ref)/h_ref];
+psidot_ref = [y(1,10);diff(psi_ref)/h_ref];
 
 E_ref = 1/2*m*(Xdot_ref.^2 + Ydot_ref.^2 + R^2*sin(theta_ref).*thetadot_ref.^2) + ...
     1/2*(I_A*(psidot_ref - phidot_ref.*sin(theta_ref)).^2 + ...
@@ -175,4 +175,4 @@ ylabel('Energía (J)')
 % % savefig(strcat('resultados-',num2str(tol),'-',num2str(T),'s.fig'));
 
 %% Save last simulation results
-save(strcat('res-contact2-h',num2str(h),'-alpha',num2str(alpha),'.mat'),'t0','tf','h','q','y0');
+% save(strcat('res-contact2-h',num2str(h),'-alpha',num2str(alpha),'.mat'),'t0','tf','h','q','y0');
