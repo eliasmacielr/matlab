@@ -1,4 +1,5 @@
 % TODO: write documentation and describe the problem and where it came from
+
 clearvars
 close all
 clc
@@ -100,4 +101,4 @@ eq_phi = diff(L_j,phi_j) + diff(L_i,phi_j)*partial_z - ...
 eq_psi = diff(L_j,psi_j) + diff(L_i,psi_j)*partial_z + ...
     lambda_1*R*cos(phi_j) + lambda_2*R*sin(phi_j);
 
-save sym_equations.mat q_k eq_theta eq_phi eq_psi Omega_d_1 Omega_d_2;
+save discrete_equations.mat q_k eq_theta eq_phi eq_psi Omega_d_1 Omega_d_2;
