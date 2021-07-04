@@ -4,9 +4,12 @@ clearvars
 close all
 clc
 
-% TODO: check if discrete_equations exists and if not, execute
-% discrete_equations.m
+if ~isfile('discrete_equations.mat')
+    discrete_equations
+end
+
 load discrete_equations
+
 %% Simulation parameters and Integration
 
 R = 0.5;
@@ -81,7 +84,6 @@ for j = 2:N-1
     F_psi_j   = F{5}(tj);
 
     [q(:,j+1), i] = newton_n_dim(q(:,j), q_k, subs(S), tol, 10);
-%     fprintf("%d\n", i);
 end
 
 t = t0:h:tf;
