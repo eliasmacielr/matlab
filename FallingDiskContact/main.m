@@ -147,6 +147,15 @@ xlabel('Tiempo (s)')
 ylabel('X (m)')
 
 figure
+plot(t,theta,'--x','MarkerIndices',1:10:length(X))
+hold on
+plot(t_ref,theta_ref)
+xlim([t0 tf])
+legend('Contacto (orden 2)','Referencia')
+xlabel('Tiempo (s)')
+ylabel('$\theta$ (rad)', 'Interpreter', 'latex')
+
+figure
 plot(t,E,'--x','MarkerIndices',1:10:length(X))
 hold on
 plot(t_ref,E_ref)
