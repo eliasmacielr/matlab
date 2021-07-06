@@ -34,8 +34,11 @@ plot(q,v,'bo')
 xlim([-2.5 2.5])
 ylim([-3 3])
 hold on
-plot(q(1),v(1),'ko','MarkerEdgeColor','k','MarkerFaceColor','k')
+plot(q(1),v(1),'bo','MarkerEdgeColor','b','MarkerFaceColor','b',...
+    'MarkerSize',8)
 hold on
-fc = fcontour(Eplot(theta, theta_t), [-2.5 2.5 -3 3], 'LineWidth', 1);
-xlabel('$q$','fontsize',24,'Interpreter','latex')
-ylabel('$\dot{q}$','fontsize',24,'Interpreter','latex')
+fc = fcontour(Eplot(theta, theta_t),[-2.5 2.5 -3 3],'LineColor', 'black');
+ax = gca;
+ax.FontSize = 16;
+xlabel('$q$','FontSize',24,'Interpreter','latex')
+ylabel('$\dot{q}$','FontSize',24,'Interpreter','latex')

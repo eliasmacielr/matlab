@@ -19,8 +19,8 @@ omega_0Value = sqrt(gValue/rValue);
 q = zeros(N,1);
 v = zeros(N,1);
 % Initial conditions
-q(1) = -2;    % pendulum's angle with the vertical
-v(1) = 2;
+q(1) = 1;    % pendulum's angle with the vertical
+v(1) = 0;
 for k = 1 : N-1
     v(k+1) = v(k) - h * g/l * sin(q(k));
     q(k+1) = q(k) + h * v(k+1);
@@ -31,11 +31,14 @@ Eplot(theta, theta_t) = subs(E,omega_0,omega_0Value);
 
 axis equal
 plot(q,v,'bo')
-xlim([-4 10])
-ylim([-5 5])
+xlim([-2.5 2.5])
+ylim([-3 3])
 hold on
-plot(q(1),v(1),'ko','MarkerEdgeColor','k','MarkerFaceColor','k')
+plot(q(1),v(1),'bo','MarkerEdgeColor','b','MarkerFaceColor','b',...
+    'MarkerSize',8)
 hold on
-fc = fcontour(Eplot(theta, theta_t), [-4 10 -5 5], 'LineWidth', 1);
-xlabel('$q$','fontsize',24,'Interpreter','latex')
-ylabel('$\dot{q}$','fontsize',24,'Interpreter','latex')
+fc = fcontour(Eplot(theta, theta_t), [-2.5 2.5 -3 3],'LineColor','black');
+ax = gca;
+ax.FontSize = 16;
+xlabel('$q$','FontSize',24,'Interpreter','latex')
+ylabel('$\dot{q}$','FontSize',24,'Interpreter','latex')
