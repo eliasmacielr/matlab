@@ -26,7 +26,7 @@ disk.I_T = I_T;
 g = 9.81;
 
 t0 = 0;
-tf = 5;
+tf = 50;
 T = tf - t0;
 h = 0.1;
 N = int32(T/h) + 1;
@@ -107,6 +107,29 @@ E = 1/2*m*(Xdot.^2 + Ydot.^2 + R^2*sin(theta).*thetadot.^2) + ...
         I_T*(thetadot.^2 + phidot.^2.*(cos(theta).^2))) + ...
     m*g*R*cos(theta);
 
+%% Get ode15i solution
+[t_ode15i,y_ode15i] = solve_diskODEs(disk,q0,fixed_q0,qdot0,fixed_qdot0,...
+    alpha,F,t0,tf,h,tol);
+
+% Get coordinates
+X_ode15i = y_ode15i(:,1);
+Y_ode15i = y_ode15i(:,2);
+theta_ode15i = y_ode15i(:,3);
+phi_ode15i = y_ode15i(:,4);
+psi_ode15i = y_ode15i(:,5);
+
+% Compute velocities from coordinates
+Xdot_ode15i = [y_ode15i(1,6);diff(X_ode15i)/h];
+Ydot_ode15i = [y_ode15i(1,7);diff(Y_ode15i)/h];
+thetadot_ode15i = [y_ode15i(1,8);diff(theta_ode15i)/h];
+phidot_ode15i = [y_ode15i(1,9);diff(phi_ode15i)/h];
+psidot_ode15i = [y_ode15i(1,10);diff(psi_ode15i)/h];
+
+E_ode15i = 1/2*m*(Xdot_ode15i.^2 + Ydot_ode15i.^2 + R^2*sin(theta_ode15i).*thetadot_ode15i.^2) + ...
+    1/2*(I_A*(psidot_ode15i - phidot_ode15i.*sin(theta_ode15i)).^2 + ...
+        I_T*(thetadot_ode15i.^2 + phidot_ode15i.^2.*(cos(theta_ode15i).^2))) + ...
+    m*g*R*cos(theta_ode15i);
+
 %% Get reference solution
 h_ref = h / 10;
 
@@ -137,34 +160,60 @@ E_ref = 1/2*m*(Xdot_ref.^2 + Ydot_ref.^2 + R^2*sin(theta_ref).*thetadot_ref.^2) 
 
 % TODO: repeat this same plot instructions for all coordinates and
 % velocities and the energy function
-figure
-plot(t,X,'--x','MarkerIndices',1:10:length(X))
-hold on
-plot(t_ref,X_ref)
-xlim([t0 tf])
-legend('Contacto (orden 2)','Referencia')
-xlabel('Tiempo (s)')
-ylabel('X (m)')
+marker_indices = 50;
 
 figure
-plot(t,theta,'--x','MarkerIndices',1:10:length(X))
+plot(t,X,'--o','MarkerIndices',1:marker_indices:length(X))
 hold on
-plot(t_ref,theta_ref)
+plot(t,Y,'--+','MarkerIndices',1:marker_indices:length(Y))
+hold on
+plot(t_ref,X_ref,'-.','MarkerIndices',1:marker_indices*10:length(X_ref))
+hold on
+plot(t_ref,Y_ref,'-x','MarkerIndices',1:marker_indices*10:length(Y_ref))
 xlim([t0 tf])
-legend('Contacto (orden 2)','Referencia')
+ylim('padded')
+legend('$X$','$X_{ref}$','$Y$','$Y_{ref}$','Interpreter','latex')
 xlabel('Tiempo (s)')
-ylabel('$\theta$ (rad)', 'Interpreter', 'latex')
+ylabel('$(X,Y)$ (m)', 'Interpreter', 'latex')
 
 figure
-plot(t,E,'--x','MarkerIndices',1:10:length(X))
+plot(t,theta,'--o','MarkerIndices',1:marker_indices:length(theta))
 hold on
-plot(t_ref,E_ref)
+plot(t,phi,'--+','MarkerIndices',1:marker_indices:length(phi))
+hold on
+plot(t,psi,'--*','MarkerIndices',1:marker_indices:length(psi))
+hold on
+plot(t_ref,theta_ref,'-.','MarkerIndices',1:marker_indices*10:length(theta_ref))
+hold on
+plot(t_ref,phi_ref,'-x','MarkerIndices',1:marker_indices*10:length(phi_ref))
+hold on
+plot(t_ref,psi_ref,'-*','MarkerIndices',1:marker_indices*10:length(psi_ref))
 xlim([t0 tf])
-legend('Contacto (orden 2)','Referencia')
+ylim('padded')
+legend('$\theta$','$\theta_{ref}$','$\phi$','$\phi_{ref}$','$\psi$','$\psi_{ref}$','Interpreter','latex')
 xlabel('Tiempo (s)')
-ylabel('Energía (J)')
+ylabel('$(\theta,\phi,\psi)$ (rad)', 'Interpreter', 'latex')
+
+% figure
+% plot(t,theta,'--x','MarkerIndices',1:10:length(X))
+% hold on
+% plot(t_ref,theta_ref)
+% xlim([t0 tf])
+% legend('Contacto (orden 2)','Referencia')
+% xlabel('Tiempo (s)')
+% ylabel('$\theta$ (rad)', 'Interpreter', 'latex')
+
+% figure
+% plot(t,E,'--x','MarkerIndices',1:10:length(X))
+% hold on
+% plot(t_ref,E_ref)
+% xlim([t0 tf])
+% legend('Contacto (orden 2)','Referencia')
+% xlabel('Tiempo (s)')
+% ylabel('Energía (J)')
 
 % savefig(strcat('resultados-',num2str(tol),'-',num2str(T),'s.fig'));
 
 %% Save last simulation results
 % save(strcat('res-contact2-h',num2str(h),'-alpha',num2str(alpha),'.mat'),'t0','tf','h','q','y0');
+save(strcat('res-contact2-h',num2str(h),'-alpha',num2str(alpha),'.mat'),'t0','tf','h','X','Y','theta','phi','psi','X_ode15i','Y_ode15i','theta_ode15i','phi_ode15i','psi_ode15i','X_ref','Y_ref','theta_ref','phi_ref','psi_ref');
