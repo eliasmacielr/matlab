@@ -32,8 +32,8 @@ theta_dot = (theta_k-theta_j)/h;
 phi_dot = (phi_k-phi_j)/h;
 psi_dot = (psi_k-psi_j)/h;
 
-f_j = [0 0 0*tj 0*tj 1/2];
-f_k = [0 0 0*(tj+h) 0*(tj+h) 1/2];
+f_j = [0 0 0*tj 0*tj 0*tj];
+f_k = [0 0 0*(tj+h) 0*(tj+h) 0*(tj+h)];
 q_j = [X_j; Y_j; theta_j; phi_j; psi_j];
 q_k = [X_k; Y_k; theta_k; phi_k; psi_k];
 
@@ -63,7 +63,7 @@ theta_dot = (theta_j-theta_i)/h;
 phi_dot = (phi_j-phi_i)/h;
 psi_dot = (psi_j-psi_i)/h;
 
-f_i = [0 0 0*(tj-h) 0*(tj-h) 1/2];
+f_i = [0 0 0*(tj-h) 0*(tj-h) 0*(tj-h)];
 q_i = [X_i; Y_i; theta_i; phi_i; psi_i];
 
 L_i = 1/2*m*(X_dot^2 + Y_dot^2 + R^2*sin(theta)^2*theta_dot^2) + ...

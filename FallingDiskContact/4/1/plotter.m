@@ -3,7 +3,7 @@ clearvars
 figure
 
 y0 = zeros(10,1);
-load res-contact2-h0.1-alpha0.1.mat
+load res-contact2-h0.1-alpha0.mat
 
 t = t0:h:tf;
 X = q(1,:);
@@ -49,7 +49,7 @@ clearvars -except Econtacto
 figure
 
 y0 = zeros(10,1);
-load res-ode15i-h0.1-alpha0.1.mat
+load res-ode15i-h0.1-alpha0.mat
 
 t = t0:h:tf;
 X = transpose(q(:,1));
@@ -96,7 +96,7 @@ clearvars -except Econtacto Eode15i
 figure
 
 y0 = zeros(10,1);
-load res-bench-h0.01-alpha0.1.mat
+load res-bench-h0.01-alpha0.mat
 
 t = t0:h:tf;
 X = transpose(q(:,1));
