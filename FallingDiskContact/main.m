@@ -160,39 +160,43 @@ E_ref = 1/2*m*(Xdot_ref.^2 + Ydot_ref.^2 + R^2*sin(theta_ref).*thetadot_ref.^2) 
 
 % TODO: repeat this same plot instructions for all coordinates and
 % velocities and the energy function
-marker_indices = 50;
+marker_indices = t*h/10;
 
 figure
-plot(t,X,'--o','MarkerIndices',1:marker_indices:length(X))
+plot(t,X,'-o','LineWidth',.5,'MarkerIndices',1:marker_indices:length(X))
 hold on
-plot(t,Y,'--+','MarkerIndices',1:marker_indices:length(Y))
+plot(t,Y,'-+','LineWidth',.5,'MarkerIndices',1:marker_indices:length(Y))
 hold on
-plot(t_ref,X_ref,'-.','MarkerIndices',1:marker_indices*10:length(X_ref))
+plot(t_ref,X_ref,':','LineWidth',1.5)
 hold on
-plot(t_ref,Y_ref,'-x','MarkerIndices',1:marker_indices*10:length(Y_ref))
+plot(t_ref,Y_ref,':','LineWidth',1.5)
 xlim([t0 tf])
 ylim('padded')
-legend('$X$','$X_{ref}$','$Y$','$Y_{ref}$','Interpreter','latex')
+legend('$X$','$Y$','$X_{ref}$','$Y_{ref}$','Interpreter','latex','FontSize',12)
 xlabel('Tiempo (s)')
-ylabel('$(X,Y)$ (m)', 'Interpreter', 'latex')
+ylabel('$X,Y$ (m)', 'Interpreter', 'latex','FontSize',12)
+ax = gca;
+ax.FontSize = 12;
 
 figure
-plot(t,theta,'--o','MarkerIndices',1:marker_indices:length(theta))
+plot(t,theta,'-o','LineWidth',.5,'MarkerIndices',1:marker_indices:length(theta))
 hold on
-plot(t,phi,'--+','MarkerIndices',1:marker_indices:length(phi))
+plot(t,phi,'-+','LineWidth',.5,'MarkerIndices',1:marker_indices:length(phi))
 hold on
-plot(t,psi,'--*','MarkerIndices',1:marker_indices:length(psi))
+plot(t,psi,'-*','LineWidth',.5,'MarkerIndices',1:marker_indices:length(psi))
 hold on
-plot(t_ref,theta_ref,'-.','MarkerIndices',1:marker_indices*10:length(theta_ref))
+plot(t_ref,theta_ref,':','LineWidth',1.5)
 hold on
-plot(t_ref,phi_ref,'-x','MarkerIndices',1:marker_indices*10:length(phi_ref))
+plot(t_ref,phi_ref,':','LineWidth',1.5)
 hold on
-plot(t_ref,psi_ref,'-*','MarkerIndices',1:marker_indices*10:length(psi_ref))
+plot(t_ref,psi_ref,':','LineWidth',1.5)
 xlim([t0 tf])
 ylim('padded')
-legend('$\theta$','$\theta_{ref}$','$\phi$','$\phi_{ref}$','$\psi$','$\psi_{ref}$','Interpreter','latex')
+legend('$\theta$','$\phi$','$\psi$','$\theta_{ref}$','$\phi_{ref}$','$\psi_{ref}$','Interpreter','latex','FontSize',12)
 xlabel('Tiempo (s)')
-ylabel('$(\theta,\phi,\psi)$ (rad)', 'Interpreter', 'latex')
+ylabel('$\theta,\phi,\psi$ (rad)', 'Interpreter', 'latex','FontSize',12)
+ax = gca;
+ax.FontSize = 12;
 
 % figure
 % plot(t,theta,'--x','MarkerIndices',1:10:length(X))
