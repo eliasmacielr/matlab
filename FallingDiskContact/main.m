@@ -26,7 +26,7 @@ disk.I_T = I_T;
 g = 9.81;
 
 t0 = 0;
-tf = 50;
+tf = 25;
 T = tf - t0;
 h = 0.1;
 N = int32(T/h) + 1;
@@ -35,15 +35,15 @@ tol = 1e-6;
 S = vpa(subs([eq_theta; eq_phi; eq_psi; Omega_d_1; Omega_d_2]));
 
 % Initial conditions
-% theta0 = 20*(pi/180);
-% phidot0 = -0.15*(2*pi);
-% psidot0 = ((I_T-I_A-m*R^2)*sin(theta0)*phidot0^2-m*g*R)/((I_A+m*R^2)*tan(theta0)*phidot0);
-q0 = [0; 0; 0; 0; 0];
-qdot0 = [0; 0; 0; 0; 0];
+theta0 = 20*(pi/180);
+phidot0 = -0.15*(2*pi);
+psidot0 = ((I_T-I_A-m*R^2)*sin(theta0)*phidot0^2-m*g*R)/((I_A+m*R^2)*tan(theta0)*phidot0);
+q0 = [0; 0; theta0; 0; 0];
+qdot0 = [pi/2; 0; 0; phidot0; psidot0];
 % Dissipation parameter
-alpha = 0;
+alpha = 0.1;
 % External forces
-F = {@(t) 0, @(t) 0, @(t) 0, @(t) 0, @(t) 1/2};
+F = {@(t) 0, @(t) 0, @(t) 0, @(t) 0, @(t) 0};
 
 dimq = numel(q0);
 
@@ -160,9 +160,10 @@ E_ref = 1/2*m*(Xdot_ref.^2 + Ydot_ref.^2 + R^2*sin(theta_ref).*thetadot_ref.^2) 
 
 % TODO: repeat this same plot instructions for all coordinates and
 % velocities and the energy function
-marker_indices = t*h/10;
+marker_indices = T*h*10;
 
-figure
+f = figure;
+f.Position(3:4) = [680 420];
 plot(t,X,'-o','LineWidth',.5,'MarkerIndices',1:marker_indices:length(X))
 hold on
 plot(t,Y,'-+','LineWidth',.5,'MarkerIndices',1:marker_indices:length(Y))
@@ -172,13 +173,15 @@ hold on
 plot(t_ref,Y_ref,':','LineWidth',1.5)
 xlim([t0 tf])
 ylim('padded')
-legend('$X$','$Y$','$X_{ref}$','$Y_{ref}$','Interpreter','latex','FontSize',12)
+lgd = legend('$X$','$Y$','$X_{ref}$','$Y_{ref}$','Interpreter','latex','FontSize',16);
+lgd.Location = 'northeastoutside';
 xlabel('Tiempo (s)')
-ylabel('$X,Y$ (m)', 'Interpreter', 'latex','FontSize',12)
+ylabel('$X,Y$ (m)', 'Interpreter', 'latex','FontSize',16)
 ax = gca;
 ax.FontSize = 12;
 
-figure
+f = figure;
+f.Position(3:4) = [680 420];
 plot(t,theta,'-o','LineWidth',.5,'MarkerIndices',1:marker_indices:length(theta))
 hold on
 plot(t,phi,'-+','LineWidth',.5,'MarkerIndices',1:marker_indices:length(phi))
@@ -190,34 +193,72 @@ hold on
 plot(t_ref,phi_ref,':','LineWidth',1.5)
 hold on
 plot(t_ref,psi_ref,':','LineWidth',1.5)
+ax = gca;
+ax.FontSize = 12;
 xlim([t0 tf])
 ylim('padded')
-legend('$\theta$','$\phi$','$\psi$','$\theta_{ref}$','$\phi_{ref}$','$\psi_{ref}$','Interpreter','latex','FontSize',12)
+lgd = legend('$\theta$','$\phi$','$\psi$','$\theta_{ref}$','$\phi_{ref}$','$\psi_{ref}$','Interpreter','latex','FontSize',16);
+lgd.Location = 'northeastoutside';
 xlabel('Tiempo (s)')
-ylabel('$\theta,\phi,\psi$ (rad)', 'Interpreter', 'latex','FontSize',12)
+ylabel('$\theta,\phi,\psi$ (rad)', 'Interpreter', 'latex','FontSize',16)
+
+f = figure;
+f.Position(3:4) = [680 420];
+plot(t,Xdot,'-o','LineWidth',.5,'MarkerIndices',1:marker_indices:length(X))
+hold on
+plot(t,Ydot,'-+','LineWidth',.5,'MarkerIndices',1:marker_indices:length(Y))
+hold on
+plot(t_ref,Xdot_ref,':','LineWidth',1.5)
+hold on
+plot(t_ref,Ydot_ref,':','LineWidth',1.5)
+xlim([t0 tf])
+ylim('padded')
+lgd = legend('$\dot{X}$','$\dot{Y}$','$\dot{X}_{ref}$','$\dot{Y}_{ref}$','Interpreter','latex','FontSize',16);
+lgd.Location = 'northeastoutside';
+xlabel('Tiempo (s)')
+ylabel('$\dot{X},\dot{Y}$ (m/s)', 'Interpreter', 'latex','FontSize',16)
 ax = gca;
 ax.FontSize = 12;
 
-% figure
-% plot(t,theta,'--x','MarkerIndices',1:10:length(X))
-% hold on
-% plot(t_ref,theta_ref)
-% xlim([t0 tf])
-% legend('Contacto (orden 2)','Referencia')
-% xlabel('Tiempo (s)')
-% ylabel('$\theta$ (rad)', 'Interpreter', 'latex')
+f = figure;
+f.Position(3:4) = [680 420];
+plot(t,thetadot,'-o','LineWidth',.5,'MarkerIndices',1:marker_indices:length(theta))
+hold on
+plot(t,phidot,'-+','LineWidth',.5,'MarkerIndices',1:marker_indices:length(phi))
+hold on
+plot(t,psidot,'-*','LineWidth',.5,'MarkerIndices',1:marker_indices:length(psi))
+hold on
+plot(t_ref,thetadot_ref,':','LineWidth',1.5)
+hold on
+plot(t_ref,phidot_ref,':','LineWidth',1.5)
+hold on
+plot(t_ref,psidot_ref,':','LineWidth',1.5)
+ax = gca;
+ax.FontSize = 12;
+xlim([t0 tf])
+ylim('padded')
+lgd = legend('$\dot{\theta}$','$\dot{\phi}$','$\dot{\psi}$','$\dot{\theta}_{ref}$','$\dot{\phi}_{ref}$','$\dot{\psi}_{ref}$','Interpreter','latex','FontSize',16);
+lgd.Location = 'northeastoutside';
+xlabel('Tiempo (s)')
+ylabel('$\dot{\theta},\dot{\phi},\dot{\psi}$ (rad/s)', 'Interpreter', 'latex','FontSize',16)
 
-% figure
-% plot(t,E,'--x','MarkerIndices',1:10:length(X))
-% hold on
-% plot(t_ref,E_ref)
-% xlim([t0 tf])
-% legend('Contacto (orden 2)','Referencia')
-% xlabel('Tiempo (s)')
-% ylabel('Energía (J)')
-
-% savefig(strcat('resultados-',num2str(tol),'-',num2str(T),'s.fig'));
+f = figure;
+f.Position(3:4) = [680 420];
+plot(t,E,'-o','LineWidth',.5,'MarkerIndices',1:marker_indices:length(E))
+hold on
+plot(t_ref,E_ref,':','LineWidth',1.5)
+ax = gca;
+ax.FontSize = 12;
+xlim([t0 tf])
+ylim('padded')
+lgd = legend('Contacto (orden 2)','Referencia','FontSize',12);
+lgd.Location = 'northeastoutside';
+xlabel('Tiempo (s)')
+ylabel('Energía mecánica total (J)')
 
 %% Save last simulation results
-% save(strcat('res-contact2-h',num2str(h),'-alpha',num2str(alpha),'.mat'),'t0','tf','h','q','y0');
-save(strcat('res-contact2-h',num2str(h),'-alpha',num2str(alpha),'.mat'),'t0','tf','h','X','Y','theta','phi','psi','X_ode15i','Y_ode15i','theta_ode15i','phi_ode15i','psi_ode15i','X_ref','Y_ref','theta_ref','phi_ref','psi_ref');
+save(strcat('res-h',num2str(h),'-alpha',num2str(alpha),...
+    '.mat'),'t0','tf','h',...
+    'X','Y','theta','phi','psi',...
+    'X_ode15i','Y_ode15i','theta_ode15i','phi_ode15i','psi_ode15i',...
+    'X_ref','Y_ref','theta_ref','phi_ref','psi_ref');
