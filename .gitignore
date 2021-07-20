@@ -1,1 +1,8 @@
+*.mat
+
+*.fig
+*.eps
+*.pdf
+
+*.txt
 

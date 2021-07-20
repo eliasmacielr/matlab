@@ -8,7 +8,7 @@ I_A = 1/2*m*R^2;
 I_T = 1/4*m*R^2;
 g = 9.81;
 
-alpha = 0; % dissipation parameter
+alpha = 0.1; % dissipation parameter
 
 FX = 0*t;
 FY = 0*t;
